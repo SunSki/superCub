@@ -1,0 +1,3162 @@
+#############
+## 定数設定 ##
+#############
+
+#マウス
+const mousex -> 50000
+const mousey -> 50001
+
+
+＃color
+const black->000000
+const white->999999
+const red->990000
+const green->009900
+const blue->000099
+const sky -> 808099
+const brown -> 936743
+const gray -> 333333
+
+
+#バイクの大きさ
+const rectLength -> 10
+
+#バイクの初期位置
+const startY -> 0
+
+#重力
+gravity -> 1
+
+
+
+################
+## 変数初期設定 ##
+################
+
+##########################################################
+
+#自動書き込みしない
+memory[55001]->1
+
+
+###########
+# 時間関係 #
+###########
+time -> 0
+
+startTime -> 0
+startTime2 -> 0
+
+
+#######
+# 落下 #
+#######
+
+#バイクの位置を初期値にする
+posy -> startY
+
+#落下速度
+fallspeed -> 0
+
+#落下時間
+falltime -> 0
+
+#底の位置
+bottom -> posy + rectLength
+
+
+#########
+# ライン #
+#########
+
+#ライン１
+lineMode -> 0
+linePosx -> 0
+linePosy -> 0
+
+#ライン1の位置
+moveLinePosx -> 0
+linemove1 -> 0
+linemove2 -> 0
+lineLength -> 0
+
+#バイクがライン１上にあるかどうかの判定
+lineJudge -> 100
+beforeLineJudge -> 100
+
+#ライン１の右端　ラインから落ちる判定のため
+lineRight -> 0
+
+#ライン２
+lineMode2 -> 0
+linePos2x -> 0
+linePos2y -> 0
+
+#ライン２の位置
+moveLinePos2x -> 0
+linemove1_2 -> 0
+linemove2_2 -> 0
+lineLength2 -> 0
+
+#バイクがライン２上にあるかどうかの判定
+lineJudge2 -> 100
+beforeLineJudge2 -> 100
+
+#ライン１の右端　ラインから落ちる判定のため
+lineRight2 -> 0
+
+
+#クリック数でライン１とライン２を区別する
+linecount -> 0
+lineOrder -> 0
+
+
+########
+# ロゴ　#
+########
+
+#スタート画面のバイクの位置
+startBikePos -> 55
+
+#Enter押した後に動くバイクの位置
+startYchange -> 0
+startTimeChange -> 0
+
+
+##########
+## 背景　##
+##########
+
+#地面の動く線のx座標
+x -> 99
+
+
+#########
+# モード #
+#########
+
+#バイクの状態モード	地面、ライン上、空中
+mode -> 1
+
+#初期化コマンド　バイクがポールにぶつかると１になって再スタートされる
+gameMode -> 0
+
+#ステージのモード　ステージを変更できる
+stageMode -> 0
+
+#開始フラグ　オープニングからゲーム画面への遷移 0 -> 1 -> 2
+startFlag -> 0
+
+#########################################################
+
+
+############
+## memory ##
+############
+
+mouseX -> memory[2]
+mouseY -> memory[3]
+beforeMouseX -> memory[0]
+beforeMouseY -> memory[1]
+
+mouseRectX -> memory[6]
+mouseRectY -> memory[7]
+
+mouseClick -> memory[4]
+beforeMouseClick -> memory[5]
+
+space -> memory[8]
+beforeSpace -> memory[9]
+
+lineMousePosx -> memory[10]
+lineMousePos2x -> memory[11]
+
+
+
+############################
+#########	draw	########
+############################
+
+################################################################################
+
+###############
+## モード遷移 ##
+###############
+
+##################################################
+
+while (startFlag = 0)
+	#描写
+	memory[55000] -> 1
+
+	startTime -> startTime + 1
+
+	background(white)
+
+	if startTime > 50
+		super(23,17)
+	if startTime > 60
+		cub_logo(5,35)
+	if startTime > 100
+		GO_logo(51,58)
+
+	bike_logo(startBikePos - startTime  ,62)
+
+	if (startBikePos - startTime) < - 920
+		startBikePos -> startBikePos + 975
+
+	if(startTime > 100) * (memory[50009] = 1)
+		startFlag -> 1
+		stageMode -> 1
+
+
+while (startFlag = 1)
+	#描写
+	memory[55000] -> 1
+
+	#startTimeChange -> startTimeChange + 1
+	#if(startTimeChange > 99)
+	#	startTimeChange -> 0
+	#if(startTimeChange = 99)
+	#	startYchange -> startYchange + 5
+
+	startTime2 -> startTime2 + 1
+
+	if(startTime2 < 200)
+		bike_color3(startTime2-10,0 +startYchange)
+		bike_color3(startTime2-50,15 +startYchange)
+		bike_color3(startTime2-30,30 +startYchange)
+		bike_color3(startTime2-70,45 +startYchange)
+		bike_color3(startTime2-0,60 +startYchange)
+		bike_color3(startTime2-40,70 +startYchange)
+		bike_color3(startTime2-10,80 +startYchange)
+
+	if(startTime2 > 200)
+		startFlag -> 2
+
+
+while (startFlag = 2)
+	#描写
+	memory[55000] -> 1
+
+###################################################
+
+
+	############
+	## 初期化　##
+	############
+
+	if(gameMode = 0)
+
+		time -> 0
+		posy->startY
+		fallspeed->0
+		falltime->0
+		bottom->posy + rectLength
+		lineMode -> 0
+		linePosx -> 0
+		linePosy -> 0
+
+		moveLinePosx -> 0
+		linemove1 -> 0
+		linemove2 -> 0
+		lineLength -> 0
+
+
+		#ライン２
+		lineMode2 -> 0
+		linePos2x -> 0
+		linePos2y -> 0
+
+		moveLinePos2x -> 0
+		linemove1_2 -> 0
+		linemove2_2 -> 0
+		lineLength2 -> 0
+
+		linecount -> 0
+		lineOrder -> 0
+
+		lineJudge -> 100
+		beforeLineJudge -> 100
+
+		lineJudge2 -> 100
+		beforeLineJudge2 -> 100
+
+		lineRight -> 0
+		lineRight2 -> 0
+
+		mode -> 1
+
+		#地面の動く線
+		x -> 99
+
+		gameMode -> 1
+
+
+
+	################
+	###	時間変化　###
+	################
+
+	time -> time + 1
+
+
+
+	#############
+	#### 設定 ####
+	#############
+
+	#####################################################
+
+	 ##############
+	# 背景関連の描写 #
+	 ##############
+
+	# 背景の描写 #
+	background(sky)
+	#back7(0,0)
+	#地面の描写
+	rect(0,89,99,10,brown)
+
+	#地面の線
+	x -> x - 1
+	if (x < 0)
+		x -> 99
+	line(x,89,x,100,black)
+
+	#スタートラインの描写
+	if(time < 100)
+		rect(0,89,100-time,10,gray)
+
+
+	### mouseの設定 ###
+	### 各キーの状態を取得 #####
+
+	mouseX -> memory[mousex]
+	mouseY -> memory[mousey]
+
+	if(mouseX >= 100)
+		mouseX -> 99
+	if(mouseX < 0)
+		mouseX -> 0
+	if(mouseY >= 100)
+		mouseY -> 99
+	if(mouseY < 0)
+		mouseY -> 0
+
+	mouseClick -> memory[50002]
+
+	space -> memory[50008]
+
+	######################################################
+
+
+
+	#####################
+	## バイクの状態を分類 ##
+	#####################
+
+	######################################################
+
+	if(mode = 2)	#ライン1上にある
+		posy -> (linePosy - 11)
+		#spaceを離した時
+		if(beforeSpace = 1) * (space = 0) * (posy > 20)
+			posy -> posy - 30
+			mode -> 1
+		if(lineRight < 10)
+			mode -> 1
+
+	if(mode = 4)	#ライン２上にある
+		posy -> (linePos2y - 11)
+		if(beforeSpace = 1) * (space = 0) * (posy > 20)
+			posy -> posy - 30
+			mode -> 1
+		if(lineRight2 < 10)
+			mode -> 1
+
+	if(mode = 0)	#地面にある
+		posy -> 78
+
+		#spaceを離した時
+		if(beforeSpace = 0) * (space = 1) * (posy > 20)
+			posy -> posy - 30
+			mode -> 1
+
+	if(mode = 1)	#空中にある
+		falltime -> falltime + 1
+		fallspeed -> gravity * falltime / 10
+		posy -> posy + fallspeed
+
+		#四角がラインより上にあるかの判定
+		lineJudge -> (posy + 10 > linePosy)
+		lineJudge2 -> (posy + 10 > linePos2y)
+
+		if(posy > 70)
+			mode -> 0
+			falltime -> 0
+
+		#ラインに触れるとモードが変更される
+		if(lineMode = 2) * ((moveLinePosx - linemove1) < 30) * ((moveLinePosx + lineLength - linemove2) > 10)
+			if (beforeLineJudge = 0) * (lineJudge = 1)
+				mode -> 2
+				falltime -> 0
+
+		if(lineMode2 = 2) * ((moveLinePos2x - linemove1_2) < 30) * ((moveLinePos2x + lineLength2 - linemove2_2) > 10)
+			if (beforeLineJudge2 = 0) * (lineJudge2 = 1)
+				mode -> 4
+				falltime -> 0
+
+	beforeLineJudge -> lineJudge
+	beforeLineJudge2 -> lineJudge2
+
+	####################################################
+
+
+
+	#######################
+	#### ステージの設計 #####
+	#######################
+
+	#####################################################
+
+	#poll(長さ、時間、time, 速さ, 上か下か, posy)
+
+	#サンプル
+	#poll(5,200,time,1,1,posy)
+	#poll(,,,,,)
+
+
+	## ステージ１ ##
+	if(stageMode = 1)
+		if(poll(5,200,time,1,-1,posy) = 999)
+			gameMode -> 0
+		if(poll(10,250,time,1,-1,posy) = 999)
+			gameMode -> 0
+		if(poll(20,300,time,1,-1,posy) = 999)
+			gameMode -> 0
+		if(poll(35,500,time,1,-1,posy) = 999)
+			gameMode -> 0
+		if(poll(10,800,time,1,-1,posy) = 999)
+			gameMode -> 0
+		if(poll(60,800,time,1,1,posy) = 999)
+			gameMode -> 0
+		if(poll(20,1000,time,2,-1,posy) = 999)
+			gameMode -> 0
+		if(poll(30,1200,time,1,-1,posy) = 999)
+			gameMode -> 0
+		if(poll(40,1200,time,1,1,posy) = 999)
+			gameMode -> 0
+		if(poll(70,1400,time,1,-1,posy) = 999)
+			gameMode -> 0
+
+	## ステージ2 ##
+	if(stageMode = 2)
+		if(poll(5,200,time,1,-1,posy) = 999)
+			gameMode -> 0
+
+
+	## ステージ3 ##
+
+
+	#if(poll(,,time,,posy) = 999)
+	#	gameMode -> 0
+
+
+	## y方向の移動に制限をかける
+	if(posy < 0)
+		posy -> 0
+
+	#####################################################
+
+
+
+	###############
+	## ライン描写 ##
+	###############
+
+	#########################################################
+
+	###################
+	# ラインモードの変更 #
+	###################
+
+	if(beforeMouseClick = 0) * (mouseClick = 1)
+		linecount -> linecount + 1
+		if(odd(linecount) = -1) #奇数番の時
+			lineOrder -> 1
+		if(odd(linecount) = 1)	#偶数番の時
+			lineOrder -> 2
+
+
+	#########
+	# Line1 #
+	#########
+
+	if(beforeMouseClick = 0) * (mouseClick = 1) * (lineOrder = 1)
+		lineMode -> 1
+		linePosx -> mouseX
+		linePosy -> mouseY
+
+	if(lineMode = 1)
+		#ラインの長さ
+		lineLength -> abs(mouseX - linePosx)
+
+		lineMousePosx -> mouseX
+
+		if(lineLength > 60)
+			lineLength -> 60
+			if(mouseX > linePosx)
+				lineMousePosx -> linePosx + 60
+			if(linePosx > mouseX)
+				lineMousePosx -> linePosx - 60
+
+		line(linePosx,linePosy,lineMousePosx,linePosy,blue)
+
+	if(beforeMouseClick = 1) * (mouseClick = 0) * (lineMode = 1)
+		#左側の点を取る
+		if(lineMousePosx < linePosx)
+			moveLinePosx -> lineMousePosx
+		if(lineMousePosx > linePosx)
+			moveLinePosx -> linePosx
+		linemove1 -> 0
+		linemove2 -> 0
+		lineMode -> 2
+
+	if(lineMode = 2)#ラインが進んでいる時
+		line(moveLinePosx - linemove1, linePosy, moveLinePosx + lineLength - linemove2, linePosy,black)
+
+		linemove1 -> linemove1 + 1
+		linemove2 -> linemove2 + 1
+
+		if(linemove1 > moveLinePosx)
+			linemove1 -> moveLinePosx
+
+		if(linemove2 > (moveLinePosx + lineLength))
+			lineMode -> 0
+
+
+	#########
+	# Line2 #
+	#########
+
+	if(beforeMouseClick = 0) * (mouseClick = 1) * (lineOrder = 2)	#ラインを描き始める
+		lineMode2 -> 1
+		linePos2x -> mouseX
+		linePos2y -> mouseY
+
+	if(lineMode2 = 1)	#クリックしている間の動作
+		#ラインの長さ
+		lineLength2 -> abs(mouseX - linePos2x)
+
+		lineMousePos2x -> mouseX
+
+		if(lineLength2 > 60)
+			lineLength2 -> 60
+			if(mouseX > linePos2x)
+				lineMousePos2x -> linePos2x + 60
+			if(linePos2x > mouseX)
+				lineMousePos2x -> linePos2x - 60
+
+		line(linePos2x,linePos2y,lineMousePos2x,linePos2y,blue)
+
+	if(beforeMouseClick = 1) * (mouseClick = 0) * (lineMode2 = 1)
+		#左側の点を取る
+		if(lineMousePos2x < linePos2x)
+			moveLinePos2x -> lineMousePos2x
+		if(lineMousePos2x > linePos2x)
+			moveLinePos2x -> linePos2x
+		linemove1_2 -> 0
+		linemove2_2 -> 0
+		lineMode2 -> 2
+
+	if(lineMode2 = 2)#ラインが進んでいる時
+		line(moveLinePos2x - linemove1_2, linePos2y, moveLinePos2x + lineLength2 - linemove2_2, linePos2y,black)
+
+		linemove1_2 -> linemove1_2 + 1
+		linemove2_2 -> linemove2_2 + 1
+
+		#線の左側
+		if(linemove1_2 > moveLinePos2x)
+			linemove1_2 -> moveLinePos2x
+		#線の右側
+		if(linemove2_2 > (moveLinePos2x + lineLength2))
+			lineMode2 -> 0
+
+	#########################################################
+
+
+	##################
+	##  テスト用機能  ##
+	##################
+
+	#if(mouseClick = 1)
+	#	posy -> mouseY
+
+	#if(mode =   2)
+	#	point(10,10,black)
+
+	#point(90, posy + 10, red)
+	##確認用
+	#if(lineMode2 = 0)
+	#	rect(50,50,	1,1,black)
+	#if(lineMode2 = 1)
+	#	rect(50,50,1,1,red)
+	#if(lineMode2 = 2)
+	#	rect(50,50,1,1,green)
+	#point(20,60,black)
+
+
+
+	######################
+	##### バイクを描写 #####
+	######################
+
+	#rect(10,posy ,rectLength,rectLength,white)
+	cubmini(10,posy+1)
+	
+
+
+	############
+	## 後処理　##
+	############
+
+	#線の右端を再設定する
+	lineRight -> (moveLinePosx + lineLength - linemove2)
+	lineRight2 -> (moveLinePos2x + lineLength2 - linemove2_2)
+
+	#マウスとクリックの状態を保存
+	beforeSpace -> space
+	beforeMouseX -> mouseX
+	beforeMouseY -> mouseY
+	beforeMouseClick -> mouseClick
+
+
+
+####################
+####  definition ###
+####################
+
+###############################################################################
+
+#############
+## 数式関係 ##
+#############
+
+def div(a,b)
+	out -> (b * 100 / a)
+
+#偶数なら1、奇数なら-1を返す
+def odd(a)
+	change -> -1
+	count -> 1
+	while(a > 0)
+		a -> a - 1
+		count -> count * change
+	out -> count
+
+
+def rest(a)	#小数点以2桁まで表示
+	while(a > 100)
+		a -> a - 100
+	out -> a
+
+def mod(x,y)
+	while(x > y)
+		x -> x - y
+	out -> x
+
+def abs(x)
+	z -> 0
+	if(x >= 0)
+		z -> x
+	if(x < 0)
+		z -> x * (-1)
+	out -> z
+
+
+
+##################
+### 障害物の関数 ###
+##################
+
+def poll(l,t,time,speed,updown,posy) #up->1,down->-1
+	x -> speed * (t - time)
+	if(x > 0) * (x < 100)
+		if(updown = 1)
+			line(x,0,x,l,red)
+		if(updown = -1)
+			line(x,90,x,90 - l,red)
+	out -> 0
+	#衝突判定
+	if(x <= 20) * (x > 12)
+		if(updown = -1)
+			if((posy + 9) > (90 - l))
+				out -> 999
+
+		if(updown = 1)
+			if(posy < l)
+				out -> 999
+
+
+
+###################
+## 図形描写の関数　##
+###################
+
+def rect(x,y,a,b,c)
+	height->b
+	while(a>=0)
+		while(b>=0)
+			point(a+x,b+y,c)
+			b->b-1
+		a->a-1
+		b->height
+
+def background(c)
+	rect(0,0,99,99,c)
+
+def line(x0,y0,x1,y1,c)
+	a -> x0
+	a1 -> x1
+	b -> y0
+	b1 -> y1
+	deltax -> abs(x0 - x1)
+	deltay -> abs(y0 - y1)
+	tilt -> 0
+	if(deltay > 0) * (deltax > 0)
+		tilt -> div(deltax,deltay)
+	stepy -> 0
+
+	y -> y0
+	x -> x0
+
+	if(x0 > x1)
+	#反転させる
+		x0 -> a1
+		x1 -> a
+		y0 -> b1
+		y1 -> b
+
+		if(y1 > y0)
+			stepy -> 1
+		if(y1 < y0)
+			stepy -> -1
+
+		y -> y0
+		error -> 0
+		i -> 0
+		x -> x0
+		while(i < deltax)
+			if(error >= 50)
+				while(error >= 50)
+					y -> y + stepy
+					error -> error - 100
+					point(x+i,y,c)
+			if(error < 50)
+				i -> i + 1
+				point(x+i,y,c)
+			error -> error + tilt
+
+	if(x0 < x1)
+		if(y1 > y0)
+			stepy -> 1
+		if(y1 < y0)
+			stepy -> -1
+
+		y -> y0
+		error -> 0
+		i -> 0
+		while(i < deltax)
+			if(error >= 50)
+				while(error >= 50)
+					y -> y + stepy
+					error -> error - 100
+					point(x+i,y,c)
+			if(error < 50)
+				i -> i + 1
+				point(x+i,y,c)
+			error -> error + tilt
+
+	if(x0 = x1)
+		if(y0 > y1)
+			y0 -> y1
+			y1 -> b
+		i -> 0
+		while(i < deltay)
+			point(x0, y0 + i, c)
+			i -> i + 1
+
+
+def point(x, y, c)
+	memory[60000 + (y * 100) + x]->c
+
+###########################################################################
+
+
+
+#############
+## イラスト ##
+#############
+
+#ゲームモードで動くちっさいバイク
+def cubmini(x,y)
+	memory[60007+x+(y*100)]->000000
+	memory[60008+x+(y*100)]->000000
+	memory[60108+x+(y*100)]->000000
+	memory[60206+x+(y*100)]->000000
+	memory[60207+x+(y*100)]->000000
+	memory[60208+x+(y*100)]->000099
+	memory[60307+x+(y*100)]->999999
+	memory[60308+x+(y*100)]->996000
+	memory[60309+x+(y*100)]->999900
+	memory[60407+x+(y*100)]->999999
+	memory[60408+x+(y*100)]->000099
+	memory[60409+x+(y*100)]->999900
+	memory[60500+x+(y*100)]->000099
+	memory[60501+x+(y*100)]->000099
+	memory[60502+x+(y*100)]->000099
+	memory[60503+x+(y*100)]->000099
+	memory[60504+x+(y*100)]->000099
+	memory[60506+x+(y*100)]->999999
+	memory[60507+x+(y*100)]->999999
+	memory[60508+x+(y*100)]->000099
+	memory[60600+x+(y*100)]->000000
+	memory[60601+x+(y*100)]->000000
+	memory[60602+x+(y*100)]->000099
+	memory[60603+x+(y*100)]->000099
+	memory[60604+x+(y*100)]->000099
+	memory[60605+x+(y*100)]->000099
+	memory[60606+x+(y*100)]->999999
+	memory[60607+x+(y*100)]->999999
+	memory[60608+x+(y*100)]->000099
+	memory[60609+x+(y*100)]->000099
+	memory[60610+x+(y*100)]->000099
+	memory[60700+x+(y*100)]->000000
+	memory[60702+x+(y*100)]->999999
+	memory[60703+x+(y*100)]->999999
+	memory[60704+x+(y*100)]->000099
+	memory[60705+x+(y*100)]->000099
+	memory[60706+x+(y*100)]->999999
+	memory[60707+x+(y*100)]->000000
+	memory[60709+x+(y*100)]->000000
+	memory[60800+x+(y*100)]->000000
+	memory[60803+x+(y*100)]->000000
+	memory[60806+x+(y*100)]->999999
+	memory[60809+x+(y*100)]->000000
+	memory[60901+x+(y*100)]->000000
+	memory[60902+x+(y*100)]->000000
+	memory[60907+x+(y*100)]->000000
+	memory[60908+x+(y*100)]->000000
+
+#スタート画面のSUPUERの文字
+def super(x,y)
+	memory[60040+x+(y*100)]->990000
+	memory[60041+x+(y*100)]->990000
+	memory[60042+x+(y*100)]->990000
+	memory[60043+x+(y*100)]->990000
+	memory[60139+x+(y*100)]->990000
+	memory[60142+x+(y*100)]->990000
+	memory[60202+x+(y*100)]->990000
+	memory[60203+x+(y*100)]->990000
+	memory[60204+x+(y*100)]->990000
+	memory[60205+x+(y*100)]->990000
+	memory[60206+x+(y*100)]->990000
+	memory[60207+x+(y*100)]->990000
+	memory[60208+x+(y*100)]->990000
+	memory[60209+x+(y*100)]->990000
+	memory[60210+x+(y*100)]->990000
+	memory[60211+x+(y*100)]->990000
+	memory[60212+x+(y*100)]->990000
+	memory[60213+x+(y*100)]->990000
+	memory[60214+x+(y*100)]->990000
+	memory[60215+x+(y*100)]->990000
+	memory[60231+x+(y*100)]->990000
+	memory[60232+x+(y*100)]->990000
+	memory[60233+x+(y*100)]->990000
+	memory[60234+x+(y*100)]->990000
+	memory[60235+x+(y*100)]->990000
+	memory[60239+x+(y*100)]->990000
+	memory[60242+x+(y*100)]->990000
+	memory[60301+x+(y*100)]->990000
+	memory[60302+x+(y*100)]->990000
+	memory[60303+x+(y*100)]->990000
+	memory[60304+x+(y*100)]->990000
+	memory[60305+x+(y*100)]->990000
+	memory[60306+x+(y*100)]->990000
+	memory[60307+x+(y*100)]->990000
+	memory[60308+x+(y*100)]->990000
+	memory[60309+x+(y*100)]->990000
+	memory[60310+x+(y*100)]->990000
+	memory[60311+x+(y*100)]->990000
+	memory[60312+x+(y*100)]->990000
+	memory[60313+x+(y*100)]->990000
+	memory[60314+x+(y*100)]->990000
+	memory[60330+x+(y*100)]->990000
+	memory[60331+x+(y*100)]->990000
+	memory[60332+x+(y*100)]->990000
+	memory[60333+x+(y*100)]->990000
+	memory[60340+x+(y*100)]->990000
+	memory[60341+x+(y*100)]->990000
+	memory[60408+x+(y*100)]->990000
+	memory[60409+x+(y*100)]->990000
+	memory[60410+x+(y*100)]->990000
+	memory[60411+x+(y*100)]->990000
+	memory[60412+x+(y*100)]->990000
+	memory[60413+x+(y*100)]->990000
+	memory[60430+x+(y*100)]->990000
+	memory[60431+x+(y*100)]->990000
+	memory[60432+x+(y*100)]->990000
+	memory[60507+x+(y*100)]->990000
+	memory[60508+x+(y*100)]->990000
+	memory[60509+x+(y*100)]->990000
+	memory[60510+x+(y*100)]->990000
+	memory[60511+x+(y*100)]->990000
+	memory[60512+x+(y*100)]->990000
+	memory[60529+x+(y*100)]->990000
+	memory[60530+x+(y*100)]->990000
+	memory[60531+x+(y*100)]->990000
+	memory[60532+x+(y*100)]->990000
+	memory[60534+x+(y*100)]->990000
+	memory[60535+x+(y*100)]->990000
+	memory[60536+x+(y*100)]->990000
+	memory[60537+x+(y*100)]->990000
+	memory[60538+x+(y*100)]->990000
+	memory[60539+x+(y*100)]->990000
+	memory[60606+x+(y*100)]->990000
+	memory[60607+x+(y*100)]->990000
+	memory[60608+x+(y*100)]->990000
+	memory[60609+x+(y*100)]->990000
+	memory[60610+x+(y*100)]->990000
+	memory[60611+x+(y*100)]->990000
+	memory[60616+x+(y*100)]->990000
+	memory[60617+x+(y*100)]->990000
+	memory[60618+x+(y*100)]->990000
+	memory[60619+x+(y*100)]->990000
+	memory[60620+x+(y*100)]->990000
+	memory[60621+x+(y*100)]->990000
+	memory[60622+x+(y*100)]->990000
+	memory[60623+x+(y*100)]->990000
+	memory[60624+x+(y*100)]->990000
+	memory[60625+x+(y*100)]->990000
+	memory[60629+x+(y*100)]->990000
+	memory[60630+x+(y*100)]->990000
+	memory[60631+x+(y*100)]->990000
+	memory[60632+x+(y*100)]->990000
+	memory[60634+x+(y*100)]->990000
+	memory[60635+x+(y*100)]->990000
+	memory[60636+x+(y*100)]->990000
+	memory[60637+x+(y*100)]->990000
+	memory[60638+x+(y*100)]->990000
+	memory[60645+x+(y*100)]->990000
+	memory[60646+x+(y*100)]->990000
+	memory[60647+x+(y*100)]->990000
+	memory[60648+x+(y*100)]->990000
+	memory[60649+x+(y*100)]->990000
+	memory[60650+x+(y*100)]->990000
+	memory[60651+x+(y*100)]->990000
+	memory[60652+x+(y*100)]->990000
+	memory[60705+x+(y*100)]->990000
+	memory[60706+x+(y*100)]->990000
+	memory[60707+x+(y*100)]->990000
+	memory[60708+x+(y*100)]->990000
+	memory[60709+x+(y*100)]->990000
+	memory[60710+x+(y*100)]->990000
+	memory[60715+x+(y*100)]->990000
+	memory[60716+x+(y*100)]->990000
+	memory[60717+x+(y*100)]->990000
+	memory[60718+x+(y*100)]->990000
+	memory[60719+x+(y*100)]->990000
+	memory[60720+x+(y*100)]->990000
+	memory[60721+x+(y*100)]->990000
+	memory[60722+x+(y*100)]->990000
+	memory[60723+x+(y*100)]->990000
+	memory[60728+x+(y*100)]->990000
+	memory[60729+x+(y*100)]->990000
+	memory[60730+x+(y*100)]->990000
+	memory[60731+x+(y*100)]->990000
+	memory[60735+x+(y*100)]->990000
+	memory[60736+x+(y*100)]->990000
+	memory[60737+x+(y*100)]->990000
+	memory[60738+x+(y*100)]->990000
+	memory[60744+x+(y*100)]->990000
+	memory[60745+x+(y*100)]->990000
+	memory[60746+x+(y*100)]->990000
+	memory[60747+x+(y*100)]->990000
+	memory[60748+x+(y*100)]->990000
+	memory[60749+x+(y*100)]->990000
+	memory[60750+x+(y*100)]->990000
+	memory[60751+x+(y*100)]->990000
+	memory[60804+x+(y*100)]->990000
+	memory[60805+x+(y*100)]->990000
+	memory[60806+x+(y*100)]->990000
+	memory[60807+x+(y*100)]->990000
+	memory[60808+x+(y*100)]->990000
+	memory[60809+x+(y*100)]->990000
+	memory[60810+x+(y*100)]->990000
+	memory[60814+x+(y*100)]->990000
+	memory[60815+x+(y*100)]->990000
+	memory[60816+x+(y*100)]->990000
+	memory[60817+x+(y*100)]->990000
+	memory[60818+x+(y*100)]->990000
+	memory[60819+x+(y*100)]->990000
+	memory[60820+x+(y*100)]->990000
+	memory[60821+x+(y*100)]->990000
+	memory[60822+x+(y*100)]->990000
+	memory[60827+x+(y*100)]->990000
+	memory[60828+x+(y*100)]->990000
+	memory[60829+x+(y*100)]->990000
+	memory[60830+x+(y*100)]->990000
+	memory[60831+x+(y*100)]->990000
+	memory[60835+x+(y*100)]->990000
+	memory[60836+x+(y*100)]->990000
+	memory[60837+x+(y*100)]->990000
+	memory[60838+x+(y*100)]->990000
+	memory[60839+x+(y*100)]->990000
+	memory[60843+x+(y*100)]->990000
+	memory[60844+x+(y*100)]->990000
+	memory[60845+x+(y*100)]->990000
+	memory[60846+x+(y*100)]->990000
+	memory[60847+x+(y*100)]->990000
+	memory[60848+x+(y*100)]->990000
+	memory[60849+x+(y*100)]->990000
+	memory[60850+x+(y*100)]->990000
+	memory[60903+x+(y*100)]->990000
+	memory[60904+x+(y*100)]->990000
+	memory[60905+x+(y*100)]->990000
+	memory[60906+x+(y*100)]->990000
+	memory[60907+x+(y*100)]->990000
+	memory[60908+x+(y*100)]->990000
+	memory[60909+x+(y*100)]->990000
+	memory[60910+x+(y*100)]->990000
+	memory[60911+x+(y*100)]->990000
+	memory[60927+x+(y*100)]->990000
+	memory[60928+x+(y*100)]->990000
+	memory[60929+x+(y*100)]->990000
+	memory[60930+x+(y*100)]->990000
+	memory[60936+x+(y*100)]->990000
+	memory[60937+x+(y*100)]->990000
+	memory[60938+x+(y*100)]->990000
+	memory[60939+x+(y*100)]->990000
+	memory[61002+x+(y*100)]->990000
+	memory[61003+x+(y*100)]->990000
+	memory[61004+x+(y*100)]->990000
+	memory[61005+x+(y*100)]->990000
+	memory[61006+x+(y*100)]->990000
+	memory[61007+x+(y*100)]->990000
+	memory[61009+x+(y*100)]->990000
+	memory[61010+x+(y*100)]->990000
+	memory[61011+x+(y*100)]->990000
+	memory[61012+x+(y*100)]->990000
+	memory[61026+x+(y*100)]->990000
+	memory[61027+x+(y*100)]->990000
+	memory[61028+x+(y*100)]->990000
+	memory[61029+x+(y*100)]->990000
+	memory[61036+x+(y*100)]->990000
+	memory[61037+x+(y*100)]->990000
+	memory[61038+x+(y*100)]->990000
+	memory[61039+x+(y*100)]->990000
+	memory[61040+x+(y*100)]->990000
+	memory[61101+x+(y*100)]->990000
+	memory[61102+x+(y*100)]->990000
+	memory[61103+x+(y*100)]->990000
+	memory[61104+x+(y*100)]->990000
+	memory[61105+x+(y*100)]->990000
+	memory[61106+x+(y*100)]->990000
+	memory[61110+x+(y*100)]->990000
+	memory[61111+x+(y*100)]->990000
+	memory[61112+x+(y*100)]->990000
+	memory[61113+x+(y*100)]->990000
+	memory[61125+x+(y*100)]->990000
+	memory[61126+x+(y*100)]->990000
+	memory[61127+x+(y*100)]->990000
+	memory[61128+x+(y*100)]->990000
+	memory[61129+x+(y*100)]->990000
+	memory[61137+x+(y*100)]->990000
+	memory[61138+x+(y*100)]->990000
+	memory[61139+x+(y*100)]->990000
+	memory[61140+x+(y*100)]->990000
+	memory[61200+x+(y*100)]->990000
+	memory[61201+x+(y*100)]->990000
+	memory[61202+x+(y*100)]->990000
+	memory[61203+x+(y*100)]->990000
+	memory[61204+x+(y*100)]->990000
+	memory[61205+x+(y*100)]->990000
+	memory[61211+x+(y*100)]->990000
+	memory[61212+x+(y*100)]->990000
+	memory[61213+x+(y*100)]->990000
+	memory[61214+x+(y*100)]->990000
+	memory[61225+x+(y*100)]->990000
+	memory[61226+x+(y*100)]->990000
+	memory[61227+x+(y*100)]->990000
+	memory[61228+x+(y*100)]->990000
+	memory[61237+x+(y*100)]->990000
+	memory[61238+x+(y*100)]->990000
+	memory[61239+x+(y*100)]->990000
+	memory[61240+x+(y*100)]->990000
+
+#スタートで出てくるCUBの文字
+def cub_logo(x,y)
+	memory[60011+x+(y*100)]->990000
+	memory[60012+x+(y*100)]->990000
+	memory[60013+x+(y*100)]->990000
+	memory[60014+x+(y*100)]->990000
+	memory[60015+x+(y*100)]->990000
+	memory[60016+x+(y*100)]->990000
+	memory[60017+x+(y*100)]->990000
+	memory[60018+x+(y*100)]->990000
+	memory[60111+x+(y*100)]->990000
+	memory[60112+x+(y*100)]->990000
+	memory[60113+x+(y*100)]->990000
+	memory[60114+x+(y*100)]->990000
+	memory[60115+x+(y*100)]->990000
+	memory[60116+x+(y*100)]->990000
+	memory[60134+x+(y*100)]->990000
+	memory[60135+x+(y*100)]->990000
+	memory[60136+x+(y*100)]->990000
+	memory[60137+x+(y*100)]->990000
+	memory[60138+x+(y*100)]->990000
+	memory[60139+x+(y*100)]->990000
+	memory[60140+x+(y*100)]->990000
+	memory[60141+x+(y*100)]->990000
+	memory[60142+x+(y*100)]->990000
+	memory[60143+x+(y*100)]->990000
+	memory[60144+x+(y*100)]->990000
+	memory[60145+x+(y*100)]->990000
+	memory[60146+x+(y*100)]->990000
+	memory[60147+x+(y*100)]->990000
+	memory[60148+x+(y*100)]->990000
+	memory[60149+x+(y*100)]->990000
+	memory[60150+x+(y*100)]->990000
+	memory[60151+x+(y*100)]->990000
+	memory[60152+x+(y*100)]->990000
+	memory[60153+x+(y*100)]->990000
+	memory[60154+x+(y*100)]->990000
+	memory[60155+x+(y*100)]->990000
+	memory[60156+x+(y*100)]->990000
+	memory[60157+x+(y*100)]->990000
+	memory[60158+x+(y*100)]->990000
+	memory[60159+x+(y*100)]->990000
+	memory[60160+x+(y*100)]->990000
+	memory[60161+x+(y*100)]->990000
+	memory[60162+x+(y*100)]->990000
+	memory[60163+x+(y*100)]->990000
+	memory[60164+x+(y*100)]->990000
+	memory[60165+x+(y*100)]->990000
+	memory[60166+x+(y*100)]->990000
+	memory[60210+x+(y*100)]->990000
+	memory[60211+x+(y*100)]->990000
+	memory[60212+x+(y*100)]->990000
+	memory[60213+x+(y*100)]->990000
+	memory[60214+x+(y*100)]->990000
+	memory[60215+x+(y*100)]->990000
+	memory[60233+x+(y*100)]->990000
+	memory[60234+x+(y*100)]->990000
+	memory[60235+x+(y*100)]->990000
+	memory[60236+x+(y*100)]->990000
+	memory[60237+x+(y*100)]->990000
+	memory[60238+x+(y*100)]->990000
+	memory[60239+x+(y*100)]->990000
+	memory[60240+x+(y*100)]->990000
+	memory[60241+x+(y*100)]->990000
+	memory[60242+x+(y*100)]->990000
+	memory[60243+x+(y*100)]->990000
+	memory[60244+x+(y*100)]->990000
+	memory[60245+x+(y*100)]->990000
+	memory[60246+x+(y*100)]->990000
+	memory[60247+x+(y*100)]->990000
+	memory[60248+x+(y*100)]->990000
+	memory[60249+x+(y*100)]->990000
+	memory[60250+x+(y*100)]->990000
+	memory[60251+x+(y*100)]->990000
+	memory[60252+x+(y*100)]->990000
+	memory[60253+x+(y*100)]->990000
+	memory[60254+x+(y*100)]->990000
+	memory[60255+x+(y*100)]->990000
+	memory[60256+x+(y*100)]->990000
+	memory[60257+x+(y*100)]->990000
+	memory[60258+x+(y*100)]->990000
+	memory[60259+x+(y*100)]->990000
+	memory[60260+x+(y*100)]->990000
+	memory[60261+x+(y*100)]->990000
+	memory[60262+x+(y*100)]->990000
+	memory[60263+x+(y*100)]->990000
+	memory[60264+x+(y*100)]->990000
+	memory[60310+x+(y*100)]->990000
+	memory[60311+x+(y*100)]->990000
+	memory[60312+x+(y*100)]->990000
+	memory[60313+x+(y*100)]->990000
+	memory[60314+x+(y*100)]->990000
+	memory[60333+x+(y*100)]->990000
+	memory[60334+x+(y*100)]->990000
+	memory[60335+x+(y*100)]->990000
+	memory[60336+x+(y*100)]->990000
+	memory[60337+x+(y*100)]->990000
+	memory[60338+x+(y*100)]->990000
+	memory[60339+x+(y*100)]->990000
+	memory[60340+x+(y*100)]->990000
+	memory[60341+x+(y*100)]->990000
+	memory[60342+x+(y*100)]->990000
+	memory[60343+x+(y*100)]->990000
+	memory[60344+x+(y*100)]->990000
+	memory[60345+x+(y*100)]->990000
+	memory[60346+x+(y*100)]->990000
+	memory[60347+x+(y*100)]->990000
+	memory[60348+x+(y*100)]->990000
+	memory[60349+x+(y*100)]->990000
+	memory[60350+x+(y*100)]->990000
+	memory[60351+x+(y*100)]->990000
+	memory[60352+x+(y*100)]->990000
+	memory[60353+x+(y*100)]->990000
+	memory[60354+x+(y*100)]->990000
+	memory[60355+x+(y*100)]->990000
+	memory[60356+x+(y*100)]->990000
+	memory[60357+x+(y*100)]->990000
+	memory[60358+x+(y*100)]->990000
+	memory[60359+x+(y*100)]->990000
+	memory[60360+x+(y*100)]->990000
+	memory[60361+x+(y*100)]->990000
+	memory[60362+x+(y*100)]->990000
+	memory[60409+x+(y*100)]->990000
+	memory[60410+x+(y*100)]->990000
+	memory[60411+x+(y*100)]->990000
+	memory[60412+x+(y*100)]->990000
+	memory[60413+x+(y*100)]->990000
+	memory[60432+x+(y*100)]->990000
+	memory[60433+x+(y*100)]->990000
+	memory[60434+x+(y*100)]->990000
+	memory[60435+x+(y*100)]->990000
+	memory[60436+x+(y*100)]->990000
+	memory[60437+x+(y*100)]->990000
+	memory[60438+x+(y*100)]->990000
+	memory[60439+x+(y*100)]->990000
+	memory[60440+x+(y*100)]->990000
+	memory[60441+x+(y*100)]->990000
+	memory[60442+x+(y*100)]->990000
+	memory[60443+x+(y*100)]->990000
+	memory[60444+x+(y*100)]->990000
+	memory[60445+x+(y*100)]->990000
+	memory[60446+x+(y*100)]->990000
+	memory[60447+x+(y*100)]->990000
+	memory[60448+x+(y*100)]->990000
+	memory[60449+x+(y*100)]->990000
+	memory[60450+x+(y*100)]->990000
+	memory[60451+x+(y*100)]->990000
+	memory[60452+x+(y*100)]->990000
+	memory[60453+x+(y*100)]->990000
+	memory[60454+x+(y*100)]->990000
+	memory[60455+x+(y*100)]->990000
+	memory[60456+x+(y*100)]->990000
+	memory[60457+x+(y*100)]->990000
+	memory[60458+x+(y*100)]->990000
+	memory[60459+x+(y*100)]->990000
+	memory[60503+x+(y*100)]->990000
+	memory[60504+x+(y*100)]->990000
+	memory[60505+x+(y*100)]->990000
+	memory[60506+x+(y*100)]->990000
+	memory[60507+x+(y*100)]->990000
+	memory[60508+x+(y*100)]->990000
+	memory[60509+x+(y*100)]->990000
+	memory[60510+x+(y*100)]->990000
+	memory[60511+x+(y*100)]->990000
+	memory[60512+x+(y*100)]->990000
+	memory[60513+x+(y*100)]->990000
+	memory[60514+x+(y*100)]->990000
+	memory[60515+x+(y*100)]->990000
+	memory[60516+x+(y*100)]->990000
+	memory[60517+x+(y*100)]->990000
+	memory[60518+x+(y*100)]->990000
+	memory[60519+x+(y*100)]->990000
+	memory[60520+x+(y*100)]->990000
+	memory[60521+x+(y*100)]->990000
+	memory[60522+x+(y*100)]->990000
+	memory[60523+x+(y*100)]->990000
+	memory[60524+x+(y*100)]->990000
+	memory[60525+x+(y*100)]->990000
+	memory[60526+x+(y*100)]->990000
+	memory[60527+x+(y*100)]->990000
+	memory[60528+x+(y*100)]->990000
+	memory[60529+x+(y*100)]->990000
+	memory[60532+x+(y*100)]->990000
+	memory[60533+x+(y*100)]->990000
+	memory[60534+x+(y*100)]->990000
+	memory[60535+x+(y*100)]->990000
+	memory[60536+x+(y*100)]->990000
+	memory[60537+x+(y*100)]->990000
+	memory[60538+x+(y*100)]->990000
+	memory[60539+x+(y*100)]->990000
+	memory[60540+x+(y*100)]->990000
+	memory[60541+x+(y*100)]->990000
+	memory[60542+x+(y*100)]->990000
+	memory[60543+x+(y*100)]->990000
+	memory[60544+x+(y*100)]->990000
+	memory[60545+x+(y*100)]->990000
+	memory[60546+x+(y*100)]->990000
+	memory[60547+x+(y*100)]->990000
+	memory[60548+x+(y*100)]->990000
+	memory[60549+x+(y*100)]->990000
+	memory[60550+x+(y*100)]->990000
+	memory[60551+x+(y*100)]->990000
+	memory[60552+x+(y*100)]->990000
+	memory[60553+x+(y*100)]->990000
+	memory[60554+x+(y*100)]->990000
+	memory[60555+x+(y*100)]->990000
+	memory[60556+x+(y*100)]->990000
+	memory[60557+x+(y*100)]->990000
+	memory[60558+x+(y*100)]->990000
+	memory[60559+x+(y*100)]->990000
+	memory[60602+x+(y*100)]->990000
+	memory[60603+x+(y*100)]->990000
+	memory[60604+x+(y*100)]->990000
+	memory[60605+x+(y*100)]->990000
+	memory[60606+x+(y*100)]->990000
+	memory[60607+x+(y*100)]->990000
+	memory[60608+x+(y*100)]->990000
+	memory[60609+x+(y*100)]->990000
+	memory[60610+x+(y*100)]->990000
+	memory[60611+x+(y*100)]->990000
+	memory[60612+x+(y*100)]->990000
+	memory[60613+x+(y*100)]->990000
+	memory[60614+x+(y*100)]->990000
+	memory[60615+x+(y*100)]->990000
+	memory[60616+x+(y*100)]->990000
+	memory[60617+x+(y*100)]->990000
+	memory[60618+x+(y*100)]->990000
+	memory[60619+x+(y*100)]->990000
+	memory[60620+x+(y*100)]->990000
+	memory[60621+x+(y*100)]->990000
+	memory[60622+x+(y*100)]->990000
+	memory[60623+x+(y*100)]->990000
+	memory[60624+x+(y*100)]->990000
+	memory[60625+x+(y*100)]->990000
+	memory[60626+x+(y*100)]->990000
+	memory[60627+x+(y*100)]->990000
+	memory[60632+x+(y*100)]->990000
+	memory[60633+x+(y*100)]->990000
+	memory[60634+x+(y*100)]->990000
+	memory[60635+x+(y*100)]->990000
+	memory[60636+x+(y*100)]->990000
+	memory[60637+x+(y*100)]->990000
+	memory[60638+x+(y*100)]->990000
+	memory[60639+x+(y*100)]->990000
+	memory[60640+x+(y*100)]->990000
+	memory[60641+x+(y*100)]->990000
+	memory[60642+x+(y*100)]->990000
+	memory[60643+x+(y*100)]->990000
+	memory[60644+x+(y*100)]->990000
+	memory[60645+x+(y*100)]->990000
+	memory[60646+x+(y*100)]->990000
+	memory[60647+x+(y*100)]->990000
+	memory[60648+x+(y*100)]->990000
+	memory[60649+x+(y*100)]->990000
+	memory[60650+x+(y*100)]->990000
+	memory[60651+x+(y*100)]->990000
+	memory[60652+x+(y*100)]->990000
+	memory[60653+x+(y*100)]->990000
+	memory[60654+x+(y*100)]->990000
+	memory[60655+x+(y*100)]->990000
+	memory[60656+x+(y*100)]->990000
+	memory[60657+x+(y*100)]->990000
+	memory[60658+x+(y*100)]->990000
+	memory[60659+x+(y*100)]->990000
+	memory[60702+x+(y*100)]->990000
+	memory[60703+x+(y*100)]->990000
+	memory[60704+x+(y*100)]->990000
+	memory[60705+x+(y*100)]->990000
+	memory[60706+x+(y*100)]->990000
+	memory[60707+x+(y*100)]->990000
+	memory[60708+x+(y*100)]->990000
+	memory[60709+x+(y*100)]->990000
+	memory[60710+x+(y*100)]->990000
+	memory[60711+x+(y*100)]->990000
+	memory[60712+x+(y*100)]->990000
+	memory[60713+x+(y*100)]->990000
+	memory[60714+x+(y*100)]->990000
+	memory[60715+x+(y*100)]->990000
+	memory[60716+x+(y*100)]->990000
+	memory[60717+x+(y*100)]->990000
+	memory[60718+x+(y*100)]->990000
+	memory[60719+x+(y*100)]->990000
+	memory[60720+x+(y*100)]->990000
+	memory[60721+x+(y*100)]->990000
+	memory[60722+x+(y*100)]->990000
+	memory[60723+x+(y*100)]->990000
+	memory[60724+x+(y*100)]->990000
+	memory[60725+x+(y*100)]->990000
+	memory[60726+x+(y*100)]->990000
+	memory[60745+x+(y*100)]->990000
+	memory[60746+x+(y*100)]->990000
+	memory[60747+x+(y*100)]->990000
+	memory[60748+x+(y*100)]->990000
+	memory[60749+x+(y*100)]->990000
+	memory[60750+x+(y*100)]->990000
+	memory[60751+x+(y*100)]->990000
+	memory[60752+x+(y*100)]->990000
+	memory[60753+x+(y*100)]->990000
+	memory[60754+x+(y*100)]->990000
+	memory[60755+x+(y*100)]->990000
+	memory[60756+x+(y*100)]->990000
+	memory[60757+x+(y*100)]->990000
+	memory[60801+x+(y*100)]->990000
+	memory[60802+x+(y*100)]->990000
+	memory[60803+x+(y*100)]->990000
+	memory[60804+x+(y*100)]->990000
+	memory[60805+x+(y*100)]->990000
+	memory[60806+x+(y*100)]->990000
+	memory[60807+x+(y*100)]->990000
+	memory[60808+x+(y*100)]->990000
+	memory[60809+x+(y*100)]->990000
+	memory[60810+x+(y*100)]->990000
+	memory[60811+x+(y*100)]->990000
+	memory[60812+x+(y*100)]->990000
+	memory[60813+x+(y*100)]->990000
+	memory[60814+x+(y*100)]->990000
+	memory[60815+x+(y*100)]->990000
+	memory[60816+x+(y*100)]->990000
+	memory[60817+x+(y*100)]->990000
+	memory[60818+x+(y*100)]->990000
+	memory[60819+x+(y*100)]->990000
+	memory[60820+x+(y*100)]->990000
+	memory[60821+x+(y*100)]->990000
+	memory[60822+x+(y*100)]->990000
+	memory[60823+x+(y*100)]->990000
+	memory[60824+x+(y*100)]->990000
+	memory[60825+x+(y*100)]->990000
+	memory[60844+x+(y*100)]->990000
+	memory[60845+x+(y*100)]->990000
+	memory[60846+x+(y*100)]->990000
+	memory[60847+x+(y*100)]->990000
+	memory[60848+x+(y*100)]->990000
+	memory[60849+x+(y*100)]->990000
+	memory[60850+x+(y*100)]->990000
+	memory[60851+x+(y*100)]->990000
+	memory[60852+x+(y*100)]->990000
+	memory[60853+x+(y*100)]->990000
+	memory[60854+x+(y*100)]->990000
+	memory[60855+x+(y*100)]->990000
+	memory[60856+x+(y*100)]->990000
+	memory[60906+x+(y*100)]->990000
+	memory[60907+x+(y*100)]->990000
+	memory[60908+x+(y*100)]->990000
+	memory[60909+x+(y*100)]->990000
+	memory[60910+x+(y*100)]->990000
+	memory[60911+x+(y*100)]->990000
+	memory[60918+x+(y*100)]->990000
+	memory[60919+x+(y*100)]->990000
+	memory[60920+x+(y*100)]->990000
+	memory[60921+x+(y*100)]->990000
+	memory[60922+x+(y*100)]->990000
+	memory[60923+x+(y*100)]->990000
+	memory[60924+x+(y*100)]->990000
+	memory[60944+x+(y*100)]->990000
+	memory[60945+x+(y*100)]->990000
+	memory[60946+x+(y*100)]->990000
+	memory[60947+x+(y*100)]->990000
+	memory[60948+x+(y*100)]->990000
+	memory[60949+x+(y*100)]->990000
+	memory[60950+x+(y*100)]->990000
+	memory[60951+x+(y*100)]->990000
+	memory[60952+x+(y*100)]->990000
+	memory[60953+x+(y*100)]->990000
+	memory[60954+x+(y*100)]->990000
+	memory[60955+x+(y*100)]->990000
+	memory[60959+x+(y*100)]->990000
+	memory[60960+x+(y*100)]->990000
+	memory[60961+x+(y*100)]->990000
+	memory[60962+x+(y*100)]->990000
+	memory[60963+x+(y*100)]->990000
+	memory[60966+x+(y*100)]->990000
+	memory[60967+x+(y*100)]->990000
+	memory[60968+x+(y*100)]->990000
+	memory[60969+x+(y*100)]->990000
+	memory[60970+x+(y*100)]->990000
+	memory[60971+x+(y*100)]->990000
+	memory[61006+x+(y*100)]->990000
+	memory[61007+x+(y*100)]->990000
+	memory[61008+x+(y*100)]->990000
+	memory[61009+x+(y*100)]->990000
+	memory[61010+x+(y*100)]->990000
+	memory[61011+x+(y*100)]->990000
+	memory[61018+x+(y*100)]->990000
+	memory[61019+x+(y*100)]->990000
+	memory[61020+x+(y*100)]->990000
+	memory[61021+x+(y*100)]->990000
+	memory[61022+x+(y*100)]->990000
+	memory[61023+x+(y*100)]->990000
+	memory[61043+x+(y*100)]->990000
+	memory[61044+x+(y*100)]->990000
+	memory[61045+x+(y*100)]->990000
+	memory[61046+x+(y*100)]->990000
+	memory[61047+x+(y*100)]->990000
+	memory[61048+x+(y*100)]->990000
+	memory[61049+x+(y*100)]->990000
+	memory[61050+x+(y*100)]->990000
+	memory[61051+x+(y*100)]->990000
+	memory[61052+x+(y*100)]->990000
+	memory[61053+x+(y*100)]->990000
+	memory[61054+x+(y*100)]->990000
+	memory[61059+x+(y*100)]->990000
+	memory[61060+x+(y*100)]->990000
+	memory[61061+x+(y*100)]->990000
+	memory[61062+x+(y*100)]->990000
+	memory[61063+x+(y*100)]->990000
+	memory[61066+x+(y*100)]->990000
+	memory[61067+x+(y*100)]->990000
+	memory[61068+x+(y*100)]->990000
+	memory[61069+x+(y*100)]->990000
+	memory[61070+x+(y*100)]->990000
+	memory[61105+x+(y*100)]->990000
+	memory[61106+x+(y*100)]->990000
+	memory[61107+x+(y*100)]->990000
+	memory[61108+x+(y*100)]->990000
+	memory[61109+x+(y*100)]->990000
+	memory[61110+x+(y*100)]->990000
+	memory[61117+x+(y*100)]->990000
+	memory[61118+x+(y*100)]->990000
+	memory[61119+x+(y*100)]->990000
+	memory[61120+x+(y*100)]->990000
+	memory[61121+x+(y*100)]->990000
+	memory[61122+x+(y*100)]->990000
+	memory[61123+x+(y*100)]->990000
+	memory[61142+x+(y*100)]->990000
+	memory[61143+x+(y*100)]->990000
+	memory[61144+x+(y*100)]->990000
+	memory[61145+x+(y*100)]->990000
+	memory[61146+x+(y*100)]->990000
+	memory[61147+x+(y*100)]->990000
+	memory[61148+x+(y*100)]->990000
+	memory[61149+x+(y*100)]->990000
+	memory[61150+x+(y*100)]->990000
+	memory[61151+x+(y*100)]->990000
+	memory[61152+x+(y*100)]->990000
+	memory[61153+x+(y*100)]->990000
+	memory[61159+x+(y*100)]->990000
+	memory[61160+x+(y*100)]->990000
+	memory[61161+x+(y*100)]->990000
+	memory[61162+x+(y*100)]->990000
+	memory[61163+x+(y*100)]->990000
+	memory[61166+x+(y*100)]->990000
+	memory[61167+x+(y*100)]->990000
+	memory[61168+x+(y*100)]->990000
+	memory[61169+x+(y*100)]->990000
+	memory[61170+x+(y*100)]->990000
+	memory[61205+x+(y*100)]->990000
+	memory[61206+x+(y*100)]->990000
+	memory[61207+x+(y*100)]->990000
+	memory[61208+x+(y*100)]->990000
+	memory[61209+x+(y*100)]->990000
+	memory[61210+x+(y*100)]->990000
+	memory[61217+x+(y*100)]->990000
+	memory[61218+x+(y*100)]->990000
+	memory[61219+x+(y*100)]->990000
+	memory[61220+x+(y*100)]->990000
+	memory[61221+x+(y*100)]->990000
+	memory[61222+x+(y*100)]->990000
+	memory[61241+x+(y*100)]->990000
+	memory[61242+x+(y*100)]->990000
+	memory[61243+x+(y*100)]->990000
+	memory[61244+x+(y*100)]->990000
+	memory[61245+x+(y*100)]->990000
+	memory[61246+x+(y*100)]->990000
+	memory[61247+x+(y*100)]->990000
+	memory[61248+x+(y*100)]->990000
+	memory[61249+x+(y*100)]->990000
+	memory[61250+x+(y*100)]->990000
+	memory[61251+x+(y*100)]->990000
+	memory[61252+x+(y*100)]->990000
+	memory[61258+x+(y*100)]->990000
+	memory[61259+x+(y*100)]->990000
+	memory[61260+x+(y*100)]->990000
+	memory[61261+x+(y*100)]->990000
+	memory[61262+x+(y*100)]->990000
+	memory[61265+x+(y*100)]->990000
+	memory[61266+x+(y*100)]->990000
+	memory[61267+x+(y*100)]->990000
+	memory[61268+x+(y*100)]->990000
+	memory[61269+x+(y*100)]->990000
+	memory[61304+x+(y*100)]->990000
+	memory[61305+x+(y*100)]->990000
+	memory[61306+x+(y*100)]->990000
+	memory[61307+x+(y*100)]->990000
+	memory[61308+x+(y*100)]->990000
+	memory[61309+x+(y*100)]->990000
+	memory[61310+x+(y*100)]->990000
+	memory[61316+x+(y*100)]->990000
+	memory[61317+x+(y*100)]->990000
+	memory[61318+x+(y*100)]->990000
+	memory[61319+x+(y*100)]->990000
+	memory[61320+x+(y*100)]->990000
+	memory[61321+x+(y*100)]->990000
+	memory[61322+x+(y*100)]->990000
+	memory[61341+x+(y*100)]->990000
+	memory[61342+x+(y*100)]->990000
+	memory[61343+x+(y*100)]->990000
+	memory[61344+x+(y*100)]->990000
+	memory[61345+x+(y*100)]->990000
+	memory[61346+x+(y*100)]->990000
+	memory[61347+x+(y*100)]->990000
+	memory[61348+x+(y*100)]->990000
+	memory[61349+x+(y*100)]->990000
+	memory[61350+x+(y*100)]->990000
+	memory[61351+x+(y*100)]->990000
+	memory[61358+x+(y*100)]->990000
+	memory[61359+x+(y*100)]->990000
+	memory[61360+x+(y*100)]->990000
+	memory[61361+x+(y*100)]->990000
+	memory[61362+x+(y*100)]->990000
+	memory[61365+x+(y*100)]->990000
+	memory[61366+x+(y*100)]->990000
+	memory[61367+x+(y*100)]->990000
+	memory[61368+x+(y*100)]->990000
+	memory[61369+x+(y*100)]->990000
+	memory[61404+x+(y*100)]->990000
+	memory[61405+x+(y*100)]->990000
+	memory[61406+x+(y*100)]->990000
+	memory[61407+x+(y*100)]->990000
+	memory[61408+x+(y*100)]->990000
+	memory[61409+x+(y*100)]->990000
+	memory[61416+x+(y*100)]->990000
+	memory[61417+x+(y*100)]->990000
+	memory[61418+x+(y*100)]->990000
+	memory[61419+x+(y*100)]->990000
+	memory[61420+x+(y*100)]->990000
+	memory[61421+x+(y*100)]->990000
+	memory[61440+x+(y*100)]->990000
+	memory[61441+x+(y*100)]->990000
+	memory[61442+x+(y*100)]->990000
+	memory[61443+x+(y*100)]->990000
+	memory[61444+x+(y*100)]->990000
+	memory[61445+x+(y*100)]->990000
+	memory[61446+x+(y*100)]->990000
+	memory[61447+x+(y*100)]->990000
+	memory[61448+x+(y*100)]->990000
+	memory[61449+x+(y*100)]->990000
+	memory[61450+x+(y*100)]->990000
+	memory[61457+x+(y*100)]->990000
+	memory[61458+x+(y*100)]->990000
+	memory[61459+x+(y*100)]->990000
+	memory[61460+x+(y*100)]->990000
+	memory[61461+x+(y*100)]->990000
+	memory[61462+x+(y*100)]->990000
+	memory[61464+x+(y*100)]->990000
+	memory[61465+x+(y*100)]->990000
+	memory[61466+x+(y*100)]->990000
+	memory[61467+x+(y*100)]->990000
+	memory[61468+x+(y*100)]->990000
+	memory[61469+x+(y*100)]->990000
+	memory[61503+x+(y*100)]->990000
+	memory[61504+x+(y*100)]->990000
+	memory[61505+x+(y*100)]->990000
+	memory[61506+x+(y*100)]->990000
+	memory[61507+x+(y*100)]->990000
+	memory[61508+x+(y*100)]->990000
+	memory[61509+x+(y*100)]->990000
+	memory[61515+x+(y*100)]->990000
+	memory[61516+x+(y*100)]->990000
+	memory[61517+x+(y*100)]->990000
+	memory[61518+x+(y*100)]->990000
+	memory[61519+x+(y*100)]->990000
+	memory[61520+x+(y*100)]->990000
+	memory[61521+x+(y*100)]->990000
+	memory[61540+x+(y*100)]->990000
+	memory[61541+x+(y*100)]->990000
+	memory[61542+x+(y*100)]->990000
+	memory[61543+x+(y*100)]->990000
+	memory[61544+x+(y*100)]->990000
+	memory[61545+x+(y*100)]->990000
+	memory[61546+x+(y*100)]->990000
+	memory[61547+x+(y*100)]->990000
+	memory[61548+x+(y*100)]->990000
+	memory[61549+x+(y*100)]->990000
+	memory[61550+x+(y*100)]->990000
+	memory[61557+x+(y*100)]->990000
+	memory[61558+x+(y*100)]->990000
+	memory[61559+x+(y*100)]->990000
+	memory[61560+x+(y*100)]->990000
+	memory[61561+x+(y*100)]->990000
+	memory[61564+x+(y*100)]->990000
+	memory[61565+x+(y*100)]->990000
+	memory[61566+x+(y*100)]->990000
+	memory[61567+x+(y*100)]->990000
+	memory[61568+x+(y*100)]->990000
+	memory[61603+x+(y*100)]->990000
+	memory[61604+x+(y*100)]->990000
+	memory[61605+x+(y*100)]->990000
+	memory[61606+x+(y*100)]->990000
+	memory[61607+x+(y*100)]->990000
+	memory[61608+x+(y*100)]->990000
+	memory[61615+x+(y*100)]->990000
+	memory[61616+x+(y*100)]->990000
+	memory[61617+x+(y*100)]->990000
+	memory[61618+x+(y*100)]->990000
+	memory[61619+x+(y*100)]->990000
+	memory[61620+x+(y*100)]->990000
+	memory[61639+x+(y*100)]->990000
+	memory[61640+x+(y*100)]->990000
+	memory[61641+x+(y*100)]->990000
+	memory[61642+x+(y*100)]->990000
+	memory[61643+x+(y*100)]->990000
+	memory[61644+x+(y*100)]->990000
+	memory[61645+x+(y*100)]->990000
+	memory[61646+x+(y*100)]->990000
+	memory[61647+x+(y*100)]->990000
+	memory[61648+x+(y*100)]->990000
+	memory[61649+x+(y*100)]->990000
+	memory[61702+x+(y*100)]->990000
+	memory[61703+x+(y*100)]->990000
+	memory[61704+x+(y*100)]->990000
+	memory[61705+x+(y*100)]->990000
+	memory[61706+x+(y*100)]->990000
+	memory[61707+x+(y*100)]->990000
+	memory[61708+x+(y*100)]->990000
+	memory[61714+x+(y*100)]->990000
+	memory[61715+x+(y*100)]->990000
+	memory[61716+x+(y*100)]->990000
+	memory[61717+x+(y*100)]->990000
+	memory[61718+x+(y*100)]->990000
+	memory[61719+x+(y*100)]->990000
+	memory[61720+x+(y*100)]->990000
+	memory[61738+x+(y*100)]->990000
+	memory[61739+x+(y*100)]->990000
+	memory[61740+x+(y*100)]->990000
+	memory[61741+x+(y*100)]->990000
+	memory[61742+x+(y*100)]->990000
+	memory[61743+x+(y*100)]->990000
+	memory[61744+x+(y*100)]->990000
+	memory[61745+x+(y*100)]->990000
+	memory[61746+x+(y*100)]->990000
+	memory[61747+x+(y*100)]->990000
+	memory[61748+x+(y*100)]->990000
+	memory[61802+x+(y*100)]->990000
+	memory[61803+x+(y*100)]->990000
+	memory[61804+x+(y*100)]->990000
+	memory[61805+x+(y*100)]->990000
+	memory[61806+x+(y*100)]->990000
+	memory[61807+x+(y*100)]->990000
+	memory[61808+x+(y*100)]->990000
+	memory[61814+x+(y*100)]->990000
+	memory[61815+x+(y*100)]->990000
+	memory[61816+x+(y*100)]->990000
+	memory[61817+x+(y*100)]->990000
+	memory[61818+x+(y*100)]->990000
+	memory[61819+x+(y*100)]->990000
+	memory[61820+x+(y*100)]->990000
+	memory[61838+x+(y*100)]->990000
+	memory[61839+x+(y*100)]->990000
+	memory[61840+x+(y*100)]->990000
+	memory[61841+x+(y*100)]->990000
+	memory[61842+x+(y*100)]->990000
+	memory[61843+x+(y*100)]->990000
+	memory[61844+x+(y*100)]->990000
+	memory[61845+x+(y*100)]->990000
+	memory[61846+x+(y*100)]->990000
+	memory[61847+x+(y*100)]->990000
+	memory[61848+x+(y*100)]->990000
+	memory[61902+x+(y*100)]->990000
+	memory[61903+x+(y*100)]->990000
+	memory[61904+x+(y*100)]->990000
+	memory[61905+x+(y*100)]->990000
+	memory[61906+x+(y*100)]->990000
+	memory[61907+x+(y*100)]->990000
+	memory[61914+x+(y*100)]->990000
+	memory[61915+x+(y*100)]->990000
+	memory[61916+x+(y*100)]->990000
+	memory[61917+x+(y*100)]->990000
+	memory[61918+x+(y*100)]->990000
+	memory[61919+x+(y*100)]->990000
+	memory[61937+x+(y*100)]->990000
+	memory[61938+x+(y*100)]->990000
+	memory[61939+x+(y*100)]->990000
+	memory[61940+x+(y*100)]->990000
+	memory[61941+x+(y*100)]->990000
+	memory[61942+x+(y*100)]->990000
+	memory[61943+x+(y*100)]->990000
+	memory[61944+x+(y*100)]->990000
+	memory[61945+x+(y*100)]->990000
+	memory[61946+x+(y*100)]->990000
+	memory[61947+x+(y*100)]->990000
+	memory[62001+x+(y*100)]->990000
+	memory[62002+x+(y*100)]->990000
+	memory[62003+x+(y*100)]->990000
+	memory[62004+x+(y*100)]->990000
+	memory[62005+x+(y*100)]->990000
+	memory[62006+x+(y*100)]->990000
+	memory[62007+x+(y*100)]->990000
+	memory[62013+x+(y*100)]->990000
+	memory[62014+x+(y*100)]->990000
+	memory[62015+x+(y*100)]->990000
+	memory[62016+x+(y*100)]->990000
+	memory[62017+x+(y*100)]->990000
+	memory[62018+x+(y*100)]->990000
+	memory[62019+x+(y*100)]->990000
+	memory[62036+x+(y*100)]->990000
+	memory[62037+x+(y*100)]->990000
+	memory[62038+x+(y*100)]->990000
+	memory[62039+x+(y*100)]->990000
+	memory[62040+x+(y*100)]->990000
+	memory[62041+x+(y*100)]->990000
+	memory[62042+x+(y*100)]->990000
+	memory[62043+x+(y*100)]->990000
+	memory[62044+x+(y*100)]->990000
+	memory[62045+x+(y*100)]->990000
+	memory[62046+x+(y*100)]->990000
+	memory[62101+x+(y*100)]->990000
+	memory[62102+x+(y*100)]->990000
+	memory[62103+x+(y*100)]->990000
+	memory[62104+x+(y*100)]->990000
+	memory[62105+x+(y*100)]->990000
+	memory[62106+x+(y*100)]->990000
+	memory[62113+x+(y*100)]->990000
+	memory[62114+x+(y*100)]->990000
+	memory[62115+x+(y*100)]->990000
+	memory[62116+x+(y*100)]->990000
+	memory[62117+x+(y*100)]->990000
+	memory[62118+x+(y*100)]->990000
+	memory[62135+x+(y*100)]->990000
+	memory[62136+x+(y*100)]->990000
+	memory[62137+x+(y*100)]->990000
+	memory[62138+x+(y*100)]->990000
+	memory[62139+x+(y*100)]->990000
+	memory[62140+x+(y*100)]->990000
+	memory[62141+x+(y*100)]->990000
+	memory[62142+x+(y*100)]->990000
+	memory[62143+x+(y*100)]->990000
+	memory[62144+x+(y*100)]->990000
+	memory[62145+x+(y*100)]->990000
+	memory[62200+x+(y*100)]->990000
+	memory[62201+x+(y*100)]->990000
+	memory[62202+x+(y*100)]->990000
+	memory[62203+x+(y*100)]->990000
+	memory[62204+x+(y*100)]->990000
+	memory[62205+x+(y*100)]->990000
+	memory[62206+x+(y*100)]->990000
+	memory[62212+x+(y*100)]->990000
+	memory[62213+x+(y*100)]->990000
+	memory[62214+x+(y*100)]->990000
+	memory[62215+x+(y*100)]->990000
+	memory[62216+x+(y*100)]->990000
+	memory[62217+x+(y*100)]->990000
+	memory[62218+x+(y*100)]->990000
+	memory[62235+x+(y*100)]->990000
+	memory[62236+x+(y*100)]->990000
+	memory[62237+x+(y*100)]->990000
+	memory[62238+x+(y*100)]->990000
+	memory[62239+x+(y*100)]->990000
+	memory[62240+x+(y*100)]->990000
+	memory[62241+x+(y*100)]->990000
+	memory[62242+x+(y*100)]->990000
+	memory[62243+x+(y*100)]->990000
+	memory[62244+x+(y*100)]->990000
+
+#スタートで出てくるGOの文字
+def GO_logo(x,y)
+	memory[60006+x+(y*100)]->990000
+	memory[60007+x+(y*100)]->990000
+	memory[60008+x+(y*100)]->990000
+	memory[60009+x+(y*100)]->990000
+	memory[60010+x+(y*100)]->990000
+	memory[60011+x+(y*100)]->990000
+	memory[60012+x+(y*100)]->990000
+	memory[60013+x+(y*100)]->990000
+	memory[60014+x+(y*100)]->990000
+	memory[60015+x+(y*100)]->990000
+	memory[60016+x+(y*100)]->990000
+	memory[60017+x+(y*100)]->990000
+	memory[60028+x+(y*100)]->990000
+	memory[60029+x+(y*100)]->990000
+	memory[60030+x+(y*100)]->990000
+	memory[60031+x+(y*100)]->990000
+	memory[60032+x+(y*100)]->990000
+	memory[60033+x+(y*100)]->990000
+	memory[60034+x+(y*100)]->990000
+	memory[60035+x+(y*100)]->990000
+	memory[60036+x+(y*100)]->990000
+	memory[60037+x+(y*100)]->990000
+	memory[60038+x+(y*100)]->990000
+	memory[60039+x+(y*100)]->990000
+	memory[60040+x+(y*100)]->990000
+	memory[60105+x+(y*100)]->990000
+	memory[60106+x+(y*100)]->990000
+	memory[60107+x+(y*100)]->990000
+	memory[60108+x+(y*100)]->990000
+	memory[60109+x+(y*100)]->990000
+	memory[60110+x+(y*100)]->990000
+	memory[60111+x+(y*100)]->990000
+	memory[60112+x+(y*100)]->990000
+	memory[60113+x+(y*100)]->990000
+	memory[60114+x+(y*100)]->990000
+	memory[60115+x+(y*100)]->990000
+	memory[60116+x+(y*100)]->990000
+	memory[60117+x+(y*100)]->990000
+	memory[60118+x+(y*100)]->990000
+	memory[60119+x+(y*100)]->990000
+	memory[60127+x+(y*100)]->990000
+	memory[60128+x+(y*100)]->990000
+	memory[60129+x+(y*100)]->990000
+	memory[60130+x+(y*100)]->990000
+	memory[60131+x+(y*100)]->990000
+	memory[60132+x+(y*100)]->990000
+	memory[60133+x+(y*100)]->990000
+	memory[60134+x+(y*100)]->990000
+	memory[60135+x+(y*100)]->990000
+	memory[60136+x+(y*100)]->990000
+	memory[60137+x+(y*100)]->990000
+	memory[60138+x+(y*100)]->990000
+	memory[60139+x+(y*100)]->990000
+	memory[60140+x+(y*100)]->990000
+	memory[60141+x+(y*100)]->990000
+	memory[60142+x+(y*100)]->990000
+	memory[60143+x+(y*100)]->990000
+	memory[60144+x+(y*100)]->990000
+	memory[60204+x+(y*100)]->990000
+	memory[60205+x+(y*100)]->990000
+	memory[60206+x+(y*100)]->990000
+	memory[60207+x+(y*100)]->990000
+	memory[60208+x+(y*100)]->990000
+	memory[60209+x+(y*100)]->990000
+	memory[60210+x+(y*100)]->990000
+	memory[60211+x+(y*100)]->990000
+	memory[60212+x+(y*100)]->990000
+	memory[60213+x+(y*100)]->990000
+	memory[60214+x+(y*100)]->990000
+	memory[60215+x+(y*100)]->990000
+	memory[60216+x+(y*100)]->990000
+	memory[60217+x+(y*100)]->990000
+	memory[60226+x+(y*100)]->990000
+	memory[60227+x+(y*100)]->990000
+	memory[60228+x+(y*100)]->990000
+	memory[60229+x+(y*100)]->990000
+	memory[60230+x+(y*100)]->990000
+	memory[60231+x+(y*100)]->990000
+	memory[60232+x+(y*100)]->990000
+	memory[60233+x+(y*100)]->990000
+	memory[60234+x+(y*100)]->990000
+	memory[60235+x+(y*100)]->990000
+	memory[60236+x+(y*100)]->990000
+	memory[60237+x+(y*100)]->990000
+	memory[60238+x+(y*100)]->990000
+	memory[60239+x+(y*100)]->990000
+	memory[60240+x+(y*100)]->990000
+	memory[60241+x+(y*100)]->990000
+	memory[60242+x+(y*100)]->990000
+	memory[60243+x+(y*100)]->990000
+	memory[60302+x+(y*100)]->990000
+	memory[60303+x+(y*100)]->990000
+	memory[60304+x+(y*100)]->990000
+	memory[60305+x+(y*100)]->990000
+	memory[60306+x+(y*100)]->990000
+	memory[60307+x+(y*100)]->990000
+	memory[60308+x+(y*100)]->990000
+	memory[60309+x+(y*100)]->990000
+	memory[60310+x+(y*100)]->990000
+	memory[60311+x+(y*100)]->990000
+	memory[60312+x+(y*100)]->990000
+	memory[60313+x+(y*100)]->990000
+	memory[60314+x+(y*100)]->990000
+	memory[60315+x+(y*100)]->990000
+	memory[60326+x+(y*100)]->990000
+	memory[60327+x+(y*100)]->990000
+	memory[60328+x+(y*100)]->990000
+	memory[60338+x+(y*100)]->990000
+	memory[60339+x+(y*100)]->990000
+	memory[60340+x+(y*100)]->990000
+	memory[60341+x+(y*100)]->990000
+	memory[60342+x+(y*100)]->990000
+	memory[60402+x+(y*100)]->990000
+	memory[60403+x+(y*100)]->990000
+	memory[60404+x+(y*100)]->990000
+	memory[60405+x+(y*100)]->990000
+	memory[60406+x+(y*100)]->990000
+	memory[60407+x+(y*100)]->990000
+	memory[60408+x+(y*100)]->990000
+	memory[60409+x+(y*100)]->990000
+	memory[60410+x+(y*100)]->990000
+	memory[60411+x+(y*100)]->990000
+	memory[60412+x+(y*100)]->990000
+	memory[60413+x+(y*100)]->990000
+	memory[60414+x+(y*100)]->990000
+	memory[60425+x+(y*100)]->990000
+	memory[60426+x+(y*100)]->990000
+	memory[60427+x+(y*100)]->990000
+	memory[60439+x+(y*100)]->990000
+	memory[60440+x+(y*100)]->990000
+	memory[60441+x+(y*100)]->990000
+	memory[60501+x+(y*100)]->990000
+	memory[60502+x+(y*100)]->990000
+	memory[60503+x+(y*100)]->990000
+	memory[60504+x+(y*100)]->990000
+	memory[60525+x+(y*100)]->990000
+	memory[60526+x+(y*100)]->990000
+	memory[60527+x+(y*100)]->990000
+	memory[60539+x+(y*100)]->990000
+	memory[60540+x+(y*100)]->990000
+	memory[60541+x+(y*100)]->990000
+	memory[60601+x+(y*100)]->990000
+	memory[60602+x+(y*100)]->990000
+	memory[60603+x+(y*100)]->990000
+	memory[60604+x+(y*100)]->990000
+	memory[60625+x+(y*100)]->990000
+	memory[60626+x+(y*100)]->990000
+	memory[60627+x+(y*100)]->990000
+	memory[60639+x+(y*100)]->990000
+	memory[60640+x+(y*100)]->990000
+	memory[60641+x+(y*100)]->990000
+	memory[60700+x+(y*100)]->990000
+	memory[60701+x+(y*100)]->990000
+	memory[60702+x+(y*100)]->990000
+	memory[60703+x+(y*100)]->990000
+	memory[60725+x+(y*100)]->990000
+	memory[60726+x+(y*100)]->990000
+	memory[60727+x+(y*100)]->990000
+	memory[60739+x+(y*100)]->990000
+	memory[60740+x+(y*100)]->990000
+	memory[60741+x+(y*100)]->990000
+	memory[60800+x+(y*100)]->990000
+	memory[60801+x+(y*100)]->990000
+	memory[60802+x+(y*100)]->990000
+	memory[60803+x+(y*100)]->990000
+	memory[60825+x+(y*100)]->990000
+	memory[60826+x+(y*100)]->990000
+	memory[60827+x+(y*100)]->990000
+	memory[60839+x+(y*100)]->990000
+	memory[60840+x+(y*100)]->990000
+	memory[60841+x+(y*100)]->990000
+	memory[60900+x+(y*100)]->990000
+	memory[60901+x+(y*100)]->990000
+	memory[60902+x+(y*100)]->990000
+	memory[60903+x+(y*100)]->990000
+	memory[60912+x+(y*100)]->990000
+	memory[60913+x+(y*100)]->990000
+	memory[60914+x+(y*100)]->990000
+	memory[60915+x+(y*100)]->990000
+	memory[60916+x+(y*100)]->990000
+	memory[60917+x+(y*100)]->990000
+	memory[60918+x+(y*100)]->990000
+	memory[60919+x+(y*100)]->990000
+	memory[60920+x+(y*100)]->990000
+	memory[60921+x+(y*100)]->990000
+	memory[60922+x+(y*100)]->990000
+	memory[60925+x+(y*100)]->990000
+	memory[60926+x+(y*100)]->990000
+	memory[60927+x+(y*100)]->990000
+	memory[60939+x+(y*100)]->990000
+	memory[60940+x+(y*100)]->990000
+	memory[60941+x+(y*100)]->990000
+	memory[61000+x+(y*100)]->990000
+	memory[61001+x+(y*100)]->990000
+	memory[61002+x+(y*100)]->990000
+	memory[61003+x+(y*100)]->990000
+	memory[61012+x+(y*100)]->990000
+	memory[61013+x+(y*100)]->990000
+	memory[61014+x+(y*100)]->990000
+	memory[61015+x+(y*100)]->990000
+	memory[61016+x+(y*100)]->990000
+	memory[61017+x+(y*100)]->990000
+	memory[61018+x+(y*100)]->990000
+	memory[61019+x+(y*100)]->990000
+	memory[61020+x+(y*100)]->990000
+	memory[61025+x+(y*100)]->990000
+	memory[61026+x+(y*100)]->990000
+	memory[61027+x+(y*100)]->990000
+	memory[61039+x+(y*100)]->990000
+	memory[61040+x+(y*100)]->990000
+	memory[61041+x+(y*100)]->990000
+	memory[61100+x+(y*100)]->990000
+	memory[61101+x+(y*100)]->990000
+	memory[61102+x+(y*100)]->990000
+	memory[61103+x+(y*100)]->990000
+	memory[61112+x+(y*100)]->990000
+	memory[61113+x+(y*100)]->990000
+	memory[61114+x+(y*100)]->990000
+	memory[61115+x+(y*100)]->990000
+	memory[61116+x+(y*100)]->990000
+	memory[61117+x+(y*100)]->990000
+	memory[61118+x+(y*100)]->990000
+	memory[61119+x+(y*100)]->990000
+	memory[61125+x+(y*100)]->990000
+	memory[61126+x+(y*100)]->990000
+	memory[61127+x+(y*100)]->990000
+	memory[61139+x+(y*100)]->990000
+	memory[61140+x+(y*100)]->990000
+	memory[61141+x+(y*100)]->990000
+	memory[61200+x+(y*100)]->990000
+	memory[61201+x+(y*100)]->990000
+	memory[61202+x+(y*100)]->990000
+	memory[61203+x+(y*100)]->990000
+	memory[61216+x+(y*100)]->990000
+	memory[61217+x+(y*100)]->990000
+	memory[61218+x+(y*100)]->990000
+	memory[61225+x+(y*100)]->990000
+	memory[61226+x+(y*100)]->990000
+	memory[61227+x+(y*100)]->990000
+	memory[61239+x+(y*100)]->990000
+	memory[61240+x+(y*100)]->990000
+	memory[61241+x+(y*100)]->990000
+	memory[61300+x+(y*100)]->990000
+	memory[61301+x+(y*100)]->990000
+	memory[61302+x+(y*100)]->990000
+	memory[61303+x+(y*100)]->990000
+	memory[61316+x+(y*100)]->990000
+	memory[61317+x+(y*100)]->990000
+	memory[61318+x+(y*100)]->990000
+	memory[61325+x+(y*100)]->990000
+	memory[61326+x+(y*100)]->990000
+	memory[61327+x+(y*100)]->990000
+	memory[61339+x+(y*100)]->990000
+	memory[61340+x+(y*100)]->990000
+	memory[61341+x+(y*100)]->990000
+	memory[61401+x+(y*100)]->990000
+	memory[61402+x+(y*100)]->990000
+	memory[61403+x+(y*100)]->990000
+	memory[61404+x+(y*100)]->990000
+	memory[61415+x+(y*100)]->990000
+	memory[61416+x+(y*100)]->990000
+	memory[61417+x+(y*100)]->990000
+	memory[61418+x+(y*100)]->990000
+	memory[61425+x+(y*100)]->990000
+	memory[61426+x+(y*100)]->990000
+	memory[61427+x+(y*100)]->990000
+	memory[61439+x+(y*100)]->990000
+	memory[61440+x+(y*100)]->990000
+	memory[61441+x+(y*100)]->990000
+	memory[61501+x+(y*100)]->990000
+	memory[61502+x+(y*100)]->990000
+	memory[61503+x+(y*100)]->990000
+	memory[61504+x+(y*100)]->990000
+	memory[61515+x+(y*100)]->990000
+	memory[61516+x+(y*100)]->990000
+	memory[61517+x+(y*100)]->990000
+	memory[61525+x+(y*100)]->990000
+	memory[61526+x+(y*100)]->990000
+	memory[61527+x+(y*100)]->990000
+	memory[61539+x+(y*100)]->990000
+	memory[61540+x+(y*100)]->990000
+	memory[61541+x+(y*100)]->990000
+	memory[61602+x+(y*100)]->990000
+	memory[61603+x+(y*100)]->990000
+	memory[61604+x+(y*100)]->990000
+	memory[61605+x+(y*100)]->990000
+	memory[61606+x+(y*100)]->990000
+	memory[61607+x+(y*100)]->990000
+	memory[61608+x+(y*100)]->990000
+	memory[61609+x+(y*100)]->990000
+	memory[61610+x+(y*100)]->990000
+	memory[61611+x+(y*100)]->990000
+	memory[61612+x+(y*100)]->990000
+	memory[61613+x+(y*100)]->990000
+	memory[61614+x+(y*100)]->990000
+	memory[61615+x+(y*100)]->990000
+	memory[61616+x+(y*100)]->990000
+	memory[61617+x+(y*100)]->990000
+	memory[61625+x+(y*100)]->990000
+	memory[61626+x+(y*100)]->990000
+	memory[61627+x+(y*100)]->990000
+	memory[61639+x+(y*100)]->990000
+	memory[61640+x+(y*100)]->990000
+	memory[61641+x+(y*100)]->990000
+	memory[61702+x+(y*100)]->990000
+	memory[61703+x+(y*100)]->990000
+	memory[61704+x+(y*100)]->990000
+	memory[61705+x+(y*100)]->990000
+	memory[61706+x+(y*100)]->990000
+	memory[61707+x+(y*100)]->990000
+	memory[61708+x+(y*100)]->990000
+	memory[61709+x+(y*100)]->990000
+	memory[61710+x+(y*100)]->990000
+	memory[61711+x+(y*100)]->990000
+	memory[61712+x+(y*100)]->990000
+	memory[61713+x+(y*100)]->990000
+	memory[61714+x+(y*100)]->990000
+	memory[61715+x+(y*100)]->990000
+	memory[61716+x+(y*100)]->990000
+	memory[61717+x+(y*100)]->990000
+	memory[61726+x+(y*100)]->990000
+	memory[61727+x+(y*100)]->990000
+	memory[61728+x+(y*100)]->990000
+	memory[61738+x+(y*100)]->990000
+	memory[61739+x+(y*100)]->990000
+	memory[61740+x+(y*100)]->990000
+	memory[61804+x+(y*100)]->990000
+	memory[61805+x+(y*100)]->990000
+	memory[61806+x+(y*100)]->990000
+	memory[61807+x+(y*100)]->990000
+	memory[61808+x+(y*100)]->990000
+	memory[61809+x+(y*100)]->990000
+	memory[61810+x+(y*100)]->990000
+	memory[61811+x+(y*100)]->990000
+	memory[61812+x+(y*100)]->990000
+	memory[61813+x+(y*100)]->990000
+	memory[61814+x+(y*100)]->990000
+	memory[61815+x+(y*100)]->990000
+	memory[61816+x+(y*100)]->990000
+	memory[61817+x+(y*100)]->990000
+	memory[61826+x+(y*100)]->990000
+	memory[61827+x+(y*100)]->990000
+	memory[61828+x+(y*100)]->990000
+	memory[61829+x+(y*100)]->990000
+	memory[61830+x+(y*100)]->990000
+	memory[61831+x+(y*100)]->990000
+	memory[61832+x+(y*100)]->990000
+	memory[61833+x+(y*100)]->990000
+	memory[61834+x+(y*100)]->990000
+	memory[61835+x+(y*100)]->990000
+	memory[61836+x+(y*100)]->990000
+	memory[61837+x+(y*100)]->990000
+	memory[61838+x+(y*100)]->990000
+	memory[61839+x+(y*100)]->990000
+	memory[61840+x+(y*100)]->990000
+	memory[61906+x+(y*100)]->990000
+	memory[61907+x+(y*100)]->990000
+	memory[61908+x+(y*100)]->990000
+	memory[61909+x+(y*100)]->990000
+	memory[61910+x+(y*100)]->990000
+	memory[61911+x+(y*100)]->990000
+	memory[61912+x+(y*100)]->990000
+	memory[61913+x+(y*100)]->990000
+	memory[61914+x+(y*100)]->990000
+	memory[61915+x+(y*100)]->990000
+	memory[61916+x+(y*100)]->990000
+	memory[61917+x+(y*100)]->990000
+	memory[61927+x+(y*100)]->990000
+	memory[61928+x+(y*100)]->990000
+	memory[61929+x+(y*100)]->990000
+	memory[61930+x+(y*100)]->990000
+	memory[61931+x+(y*100)]->990000
+	memory[61932+x+(y*100)]->990000
+	memory[61933+x+(y*100)]->990000
+	memory[61934+x+(y*100)]->990000
+	memory[61935+x+(y*100)]->990000
+	memory[61936+x+(y*100)]->990000
+	memory[61937+x+(y*100)]->990000
+	memory[61938+x+(y*100)]->990000
+	memory[61939+x+(y*100)]->990000
+	memory[62015+x+(y*100)]->990000
+	memory[62016+x+(y*100)]->990000
+	memory[62017+x+(y*100)]->990000
+	memory[62028+x+(y*100)]->990000
+	memory[62029+x+(y*100)]->990000
+	memory[62030+x+(y*100)]->990000
+	memory[62031+x+(y*100)]->990000
+	memory[62032+x+(y*100)]->990000
+	memory[62033+x+(y*100)]->990000
+	memory[62034+x+(y*100)]->990000
+	memory[62035+x+(y*100)]->990000
+	memory[62036+x+(y*100)]->990000
+	memory[62037+x+(y*100)]->990000
+	memory[62038+x+(y*100)]->990000
+
+#スタート画面の赤いバイク
+def bike_logo(x,y)
+	memory[60011+x+(y*100)]->990000
+	memory[60110+x+(y*100)]->990000
+	memory[60111+x+(y*100)]->990000
+	memory[60210+x+(y*100)]->990000
+	memory[60211+x+(y*100)]->990000
+	memory[60310+x+(y*100)]->990000
+	memory[60311+x+(y*100)]->990000
+	memory[60411+x+(y*100)]->990000
+	memory[60511+x+(y*100)]->990000
+	memory[60611+x+(y*100)]->990000
+	memory[60711+x+(y*100)]->990000
+	memory[60811+x+(y*100)]->990000
+	memory[60906+x+(y*100)]->990000
+	memory[60907+x+(y*100)]->990000
+	memory[60908+x+(y*100)]->990000
+	memory[60909+x+(y*100)]->990000
+	memory[60910+x+(y*100)]->990000
+	memory[60911+x+(y*100)]->990000
+	memory[61006+x+(y*100)]->990000
+	memory[61007+x+(y*100)]->990000
+	memory[61008+x+(y*100)]->990000
+	memory[61009+x+(y*100)]->990000
+	memory[61010+x+(y*100)]->990000
+	memory[61011+x+(y*100)]->990000
+	memory[61012+x+(y*100)]->990000
+	memory[61013+x+(y*100)]->990000
+	memory[61106+x+(y*100)]->990000
+	memory[61107+x+(y*100)]->990000
+	memory[61108+x+(y*100)]->990000
+	memory[61109+x+(y*100)]->990000
+	memory[61110+x+(y*100)]->990000
+	memory[61111+x+(y*100)]->990000
+	memory[61112+x+(y*100)]->990000
+	memory[61113+x+(y*100)]->990000
+	memory[61114+x+(y*100)]->990000
+	memory[61115+x+(y*100)]->990000
+	memory[61116+x+(y*100)]->990000
+	memory[61206+x+(y*100)]->990000
+	memory[61207+x+(y*100)]->990000
+	memory[61208+x+(y*100)]->990000
+	memory[61209+x+(y*100)]->990000
+	memory[61210+x+(y*100)]->990000
+	memory[61211+x+(y*100)]->990000
+	memory[61212+x+(y*100)]->990000
+	memory[61213+x+(y*100)]->990000
+	memory[61214+x+(y*100)]->990000
+	memory[61215+x+(y*100)]->990000
+	memory[61216+x+(y*100)]->990000
+	memory[61309+x+(y*100)]->990000
+	memory[61310+x+(y*100)]->990000
+	memory[61311+x+(y*100)]->990000
+	memory[61312+x+(y*100)]->990000
+	memory[61313+x+(y*100)]->990000
+	memory[61314+x+(y*100)]->990000
+	memory[61409+x+(y*100)]->990000
+	memory[61410+x+(y*100)]->990000
+	memory[61411+x+(y*100)]->990000
+	memory[61412+x+(y*100)]->990000
+	memory[61413+x+(y*100)]->990000
+	memory[61509+x+(y*100)]->990000
+	memory[61510+x+(y*100)]->990000
+	memory[61511+x+(y*100)]->990000
+	memory[61512+x+(y*100)]->990000
+	memory[61513+x+(y*100)]->990000
+	memory[61519+x+(y*100)]->990000
+	memory[61520+x+(y*100)]->990000
+	memory[61521+x+(y*100)]->990000
+	memory[61522+x+(y*100)]->990000
+	memory[61523+x+(y*100)]->990000
+	memory[61524+x+(y*100)]->990000
+	memory[61525+x+(y*100)]->990000
+	memory[61526+x+(y*100)]->990000
+	memory[61527+x+(y*100)]->990000
+	memory[61528+x+(y*100)]->990000
+	memory[61608+x+(y*100)]->990000
+	memory[61609+x+(y*100)]->990000
+	memory[61610+x+(y*100)]->990000
+	memory[61611+x+(y*100)]->990000
+	memory[61612+x+(y*100)]->990000
+	memory[61613+x+(y*100)]->990000
+	memory[61619+x+(y*100)]->990000
+	memory[61620+x+(y*100)]->990000
+	memory[61621+x+(y*100)]->990000
+	memory[61622+x+(y*100)]->990000
+	memory[61623+x+(y*100)]->990000
+	memory[61624+x+(y*100)]->990000
+	memory[61625+x+(y*100)]->990000
+	memory[61626+x+(y*100)]->990000
+	memory[61627+x+(y*100)]->990000
+	memory[61628+x+(y*100)]->990000
+	memory[61708+x+(y*100)]->990000
+	memory[61709+x+(y*100)]->990000
+	memory[61710+x+(y*100)]->990000
+	memory[61711+x+(y*100)]->990000
+	memory[61712+x+(y*100)]->990000
+	memory[61713+x+(y*100)]->990000
+	memory[61721+x+(y*100)]->990000
+	memory[61722+x+(y*100)]->990000
+	memory[61723+x+(y*100)]->990000
+	memory[61724+x+(y*100)]->990000
+	memory[61725+x+(y*100)]->990000
+	memory[61726+x+(y*100)]->990000
+	memory[61727+x+(y*100)]->990000
+	memory[61728+x+(y*100)]->990000
+	memory[61729+x+(y*100)]->990000
+	memory[61732+x+(y*100)]->990000
+	memory[61733+x+(y*100)]->990000
+	memory[61734+x+(y*100)]->990000
+	memory[61735+x+(y*100)]->990000
+	memory[61736+x+(y*100)]->990000
+	memory[61737+x+(y*100)]->990000
+	memory[61738+x+(y*100)]->990000
+	memory[61739+x+(y*100)]->990000
+	memory[61740+x+(y*100)]->990000
+	memory[61741+x+(y*100)]->990000
+	memory[61742+x+(y*100)]->990000
+	memory[61743+x+(y*100)]->990000
+	memory[61808+x+(y*100)]->990000
+	memory[61809+x+(y*100)]->990000
+	memory[61810+x+(y*100)]->990000
+	memory[61811+x+(y*100)]->990000
+	memory[61812+x+(y*100)]->990000
+	memory[61813+x+(y*100)]->990000
+	memory[61822+x+(y*100)]->990000
+	memory[61823+x+(y*100)]->990000
+	memory[61824+x+(y*100)]->990000
+	memory[61825+x+(y*100)]->990000
+	memory[61826+x+(y*100)]->990000
+	memory[61827+x+(y*100)]->990000
+	memory[61828+x+(y*100)]->990000
+	memory[61829+x+(y*100)]->990000
+	memory[61830+x+(y*100)]->990000
+	memory[61831+x+(y*100)]->990000
+	memory[61832+x+(y*100)]->990000
+	memory[61833+x+(y*100)]->990000
+	memory[61834+x+(y*100)]->990000
+	memory[61835+x+(y*100)]->990000
+	memory[61836+x+(y*100)]->990000
+	memory[61837+x+(y*100)]->990000
+	memory[61838+x+(y*100)]->990000
+	memory[61839+x+(y*100)]->990000
+	memory[61840+x+(y*100)]->990000
+	memory[61908+x+(y*100)]->990000
+	memory[61909+x+(y*100)]->990000
+	memory[61910+x+(y*100)]->990000
+	memory[61911+x+(y*100)]->990000
+	memory[61912+x+(y*100)]->990000
+	memory[61922+x+(y*100)]->990000
+	memory[61923+x+(y*100)]->990000
+	memory[61924+x+(y*100)]->990000
+	memory[61925+x+(y*100)]->990000
+	memory[61926+x+(y*100)]->990000
+	memory[61927+x+(y*100)]->990000
+	memory[61928+x+(y*100)]->990000
+	memory[61929+x+(y*100)]->990000
+	memory[61930+x+(y*100)]->990000
+	memory[61931+x+(y*100)]->990000
+	memory[61932+x+(y*100)]->990000
+	memory[61933+x+(y*100)]->990000
+	memory[61934+x+(y*100)]->990000
+	memory[61935+x+(y*100)]->990000
+	memory[61936+x+(y*100)]->990000
+	memory[61937+x+(y*100)]->990000
+	memory[61938+x+(y*100)]->990000
+	memory[62002+x+(y*100)]->990000
+	memory[62003+x+(y*100)]->990000
+	memory[62004+x+(y*100)]->990000
+	memory[62005+x+(y*100)]->990000
+	memory[62006+x+(y*100)]->990000
+	memory[62007+x+(y*100)]->990000
+	memory[62008+x+(y*100)]->990000
+	memory[62009+x+(y*100)]->990000
+	memory[62010+x+(y*100)]->990000
+	memory[62011+x+(y*100)]->990000
+	memory[62012+x+(y*100)]->990000
+	memory[62022+x+(y*100)]->990000
+	memory[62023+x+(y*100)]->990000
+	memory[62024+x+(y*100)]->990000
+	memory[62025+x+(y*100)]->990000
+	memory[62026+x+(y*100)]->990000
+	memory[62027+x+(y*100)]->990000
+	memory[62028+x+(y*100)]->990000
+	memory[62029+x+(y*100)]->990000
+	memory[62030+x+(y*100)]->990000
+	memory[62031+x+(y*100)]->990000
+	memory[62032+x+(y*100)]->990000
+	memory[62033+x+(y*100)]->990000
+	memory[62034+x+(y*100)]->990000
+	memory[62037+x+(y*100)]->990000
+	memory[62038+x+(y*100)]->990000
+	memory[62039+x+(y*100)]->990000
+	memory[62040+x+(y*100)]->990000
+	memory[62041+x+(y*100)]->990000
+	memory[62042+x+(y*100)]->990000
+	memory[62100+x+(y*100)]->990000
+	memory[62101+x+(y*100)]->990000
+	memory[62102+x+(y*100)]->990000
+	memory[62103+x+(y*100)]->990000
+	memory[62104+x+(y*100)]->990000
+	memory[62105+x+(y*100)]->990000
+	memory[62109+x+(y*100)]->990000
+	memory[62110+x+(y*100)]->990000
+	memory[62111+x+(y*100)]->990000
+	memory[62112+x+(y*100)]->990000
+	memory[62113+x+(y*100)]->990000
+	memory[62114+x+(y*100)]->990000
+	memory[62122+x+(y*100)]->990000
+	memory[62123+x+(y*100)]->990000
+	memory[62124+x+(y*100)]->990000
+	memory[62125+x+(y*100)]->990000
+	memory[62126+x+(y*100)]->990000
+	memory[62127+x+(y*100)]->990000
+	memory[62128+x+(y*100)]->990000
+	memory[62129+x+(y*100)]->990000
+	memory[62130+x+(y*100)]->990000
+	memory[62131+x+(y*100)]->990000
+	memory[62132+x+(y*100)]->990000
+	memory[62136+x+(y*100)]->990000
+	memory[62137+x+(y*100)]->990000
+	memory[62138+x+(y*100)]->990000
+	memory[62139+x+(y*100)]->990000
+	memory[62140+x+(y*100)]->990000
+	memory[62141+x+(y*100)]->990000
+	memory[62142+x+(y*100)]->990000
+	memory[62143+x+(y*100)]->990000
+	memory[62144+x+(y*100)]->990000
+	memory[62145+x+(y*100)]->990000
+	memory[62204+x+(y*100)]->990000
+	memory[62205+x+(y*100)]->990000
+	memory[62206+x+(y*100)]->990000
+	memory[62207+x+(y*100)]->990000
+	memory[62208+x+(y*100)]->990000
+	memory[62209+x+(y*100)]->990000
+	memory[62210+x+(y*100)]->990000
+	memory[62211+x+(y*100)]->990000
+	memory[62212+x+(y*100)]->990000
+	memory[62213+x+(y*100)]->990000
+	memory[62214+x+(y*100)]->990000
+	memory[62215+x+(y*100)]->990000
+	memory[62216+x+(y*100)]->990000
+	memory[62221+x+(y*100)]->990000
+	memory[62222+x+(y*100)]->990000
+	memory[62223+x+(y*100)]->990000
+	memory[62224+x+(y*100)]->990000
+	memory[62225+x+(y*100)]->990000
+	memory[62226+x+(y*100)]->990000
+	memory[62227+x+(y*100)]->990000
+	memory[62228+x+(y*100)]->990000
+	memory[62229+x+(y*100)]->990000
+	memory[62230+x+(y*100)]->990000
+	memory[62231+x+(y*100)]->990000
+	memory[62234+x+(y*100)]->990000
+	memory[62235+x+(y*100)]->990000
+	memory[62236+x+(y*100)]->990000
+	memory[62237+x+(y*100)]->990000
+	memory[62238+x+(y*100)]->990000
+	memory[62239+x+(y*100)]->990000
+	memory[62240+x+(y*100)]->990000
+	memory[62241+x+(y*100)]->990000
+	memory[62242+x+(y*100)]->990000
+	memory[62243+x+(y*100)]->990000
+	memory[62244+x+(y*100)]->990000
+	memory[62245+x+(y*100)]->990000
+	memory[62303+x+(y*100)]->990000
+	memory[62304+x+(y*100)]->990000
+	memory[62305+x+(y*100)]->990000
+	memory[62306+x+(y*100)]->990000
+	memory[62307+x+(y*100)]->990000
+	memory[62308+x+(y*100)]->990000
+	memory[62309+x+(y*100)]->990000
+	memory[62310+x+(y*100)]->990000
+	memory[62311+x+(y*100)]->990000
+	memory[62312+x+(y*100)]->990000
+	memory[62313+x+(y*100)]->990000
+	memory[62314+x+(y*100)]->990000
+	memory[62315+x+(y*100)]->990000
+	memory[62316+x+(y*100)]->990000
+	memory[62320+x+(y*100)]->990000
+	memory[62321+x+(y*100)]->990000
+	memory[62322+x+(y*100)]->990000
+	memory[62323+x+(y*100)]->990000
+	memory[62324+x+(y*100)]->990000
+	memory[62325+x+(y*100)]->990000
+	memory[62326+x+(y*100)]->990000
+	memory[62327+x+(y*100)]->990000
+	memory[62328+x+(y*100)]->990000
+	memory[62329+x+(y*100)]->990000
+	memory[62330+x+(y*100)]->990000
+	memory[62331+x+(y*100)]->990000
+	memory[62333+x+(y*100)]->990000
+	memory[62334+x+(y*100)]->990000
+	memory[62335+x+(y*100)]->990000
+	memory[62336+x+(y*100)]->990000
+	memory[62337+x+(y*100)]->990000
+	memory[62338+x+(y*100)]->990000
+	memory[62339+x+(y*100)]->990000
+	memory[62340+x+(y*100)]->990000
+	memory[62341+x+(y*100)]->990000
+	memory[62342+x+(y*100)]->990000
+	memory[62343+x+(y*100)]->990000
+	memory[62402+x+(y*100)]->990000
+	memory[62403+x+(y*100)]->990000
+	memory[62404+x+(y*100)]->990000
+	memory[62405+x+(y*100)]->990000
+	memory[62406+x+(y*100)]->990000
+	memory[62407+x+(y*100)]->990000
+	memory[62408+x+(y*100)]->990000
+	memory[62409+x+(y*100)]->990000
+	memory[62410+x+(y*100)]->990000
+	memory[62411+x+(y*100)]->990000
+	memory[62412+x+(y*100)]->990000
+	memory[62416+x+(y*100)]->990000
+	memory[62417+x+(y*100)]->990000
+	memory[62418+x+(y*100)]->990000
+	memory[62419+x+(y*100)]->990000
+	memory[62420+x+(y*100)]->990000
+	memory[62421+x+(y*100)]->990000
+	memory[62422+x+(y*100)]->990000
+	memory[62423+x+(y*100)]->990000
+	memory[62424+x+(y*100)]->990000
+	memory[62425+x+(y*100)]->990000
+	memory[62426+x+(y*100)]->990000
+	memory[62427+x+(y*100)]->990000
+	memory[62428+x+(y*100)]->990000
+	memory[62429+x+(y*100)]->990000
+	memory[62430+x+(y*100)]->990000
+	memory[62431+x+(y*100)]->990000
+	memory[62432+x+(y*100)]->990000
+	memory[62433+x+(y*100)]->990000
+	memory[62436+x+(y*100)]->990000
+	memory[62440+x+(y*100)]->990000
+	memory[62441+x+(y*100)]->990000
+	memory[62442+x+(y*100)]->990000
+	memory[62443+x+(y*100)]->990000
+	memory[62444+x+(y*100)]->990000
+	memory[62502+x+(y*100)]->990000
+	memory[62503+x+(y*100)]->990000
+	memory[62504+x+(y*100)]->990000
+	memory[62508+x+(y*100)]->990000
+	memory[62510+x+(y*100)]->990000
+	memory[62511+x+(y*100)]->990000
+	memory[62512+x+(y*100)]->990000
+	memory[62516+x+(y*100)]->990000
+	memory[62517+x+(y*100)]->990000
+	memory[62518+x+(y*100)]->990000
+	memory[62519+x+(y*100)]->990000
+	memory[62520+x+(y*100)]->990000
+	memory[62521+x+(y*100)]->990000
+	memory[62522+x+(y*100)]->990000
+	memory[62523+x+(y*100)]->990000
+	memory[62524+x+(y*100)]->990000
+	memory[62525+x+(y*100)]->990000
+	memory[62526+x+(y*100)]->990000
+	memory[62527+x+(y*100)]->990000
+	memory[62528+x+(y*100)]->990000
+	memory[62529+x+(y*100)]->990000
+	memory[62530+x+(y*100)]->990000
+	memory[62531+x+(y*100)]->990000
+	memory[62532+x+(y*100)]->990000
+	memory[62536+x+(y*100)]->990000
+	memory[62541+x+(y*100)]->990000
+	memory[62542+x+(y*100)]->990000
+	memory[62543+x+(y*100)]->990000
+	memory[62544+x+(y*100)]->990000
+	memory[62602+x+(y*100)]->990000
+	memory[62603+x+(y*100)]->990000
+	memory[62607+x+(y*100)]->990000
+	memory[62608+x+(y*100)]->990000
+	memory[62611+x+(y*100)]->990000
+	memory[62612+x+(y*100)]->990000
+	memory[62613+x+(y*100)]->990000
+	memory[62614+x+(y*100)]->990000
+	memory[62615+x+(y*100)]->990000
+	memory[62616+x+(y*100)]->990000
+	memory[62617+x+(y*100)]->990000
+	memory[62618+x+(y*100)]->990000
+	memory[62619+x+(y*100)]->990000
+	memory[62620+x+(y*100)]->990000
+	memory[62621+x+(y*100)]->990000
+	memory[62622+x+(y*100)]->990000
+	memory[62623+x+(y*100)]->990000
+	memory[62624+x+(y*100)]->990000
+	memory[62625+x+(y*100)]->990000
+	memory[62626+x+(y*100)]->990000
+	memory[62627+x+(y*100)]->990000
+	memory[62628+x+(y*100)]->990000
+	memory[62629+x+(y*100)]->990000
+	memory[62630+x+(y*100)]->990000
+	memory[62631+x+(y*100)]->990000
+	memory[62632+x+(y*100)]->990000
+	memory[62633+x+(y*100)]->990000
+	memory[62634+x+(y*100)]->990000
+	memory[62635+x+(y*100)]->990000
+	memory[62636+x+(y*100)]->990000
+	memory[62641+x+(y*100)]->990000
+	memory[62642+x+(y*100)]->990000
+	memory[62643+x+(y*100)]->990000
+	memory[62644+x+(y*100)]->990000
+	memory[62645+x+(y*100)]->990000
+	memory[62702+x+(y*100)]->990000
+	memory[62703+x+(y*100)]->990000
+	memory[62707+x+(y*100)]->990000
+	memory[62711+x+(y*100)]->990000
+	memory[62712+x+(y*100)]->990000
+	memory[62713+x+(y*100)]->990000
+	memory[62714+x+(y*100)]->990000
+	memory[62715+x+(y*100)]->990000
+	memory[62716+x+(y*100)]->990000
+	memory[62717+x+(y*100)]->990000
+	memory[62718+x+(y*100)]->990000
+	memory[62719+x+(y*100)]->990000
+	memory[62720+x+(y*100)]->990000
+	memory[62721+x+(y*100)]->990000
+	memory[62722+x+(y*100)]->990000
+	memory[62723+x+(y*100)]->990000
+	memory[62724+x+(y*100)]->990000
+	memory[62725+x+(y*100)]->990000
+	memory[62726+x+(y*100)]->990000
+	memory[62727+x+(y*100)]->990000
+	memory[62728+x+(y*100)]->990000
+	memory[62729+x+(y*100)]->990000
+	memory[62730+x+(y*100)]->990000
+	memory[62731+x+(y*100)]->990000
+	memory[62732+x+(y*100)]->990000
+	memory[62733+x+(y*100)]->990000
+	memory[62734+x+(y*100)]->990000
+	memory[62735+x+(y*100)]->990000
+	memory[62736+x+(y*100)]->990000
+	memory[62737+x+(y*100)]->990000
+	memory[62741+x+(y*100)]->990000
+	memory[62742+x+(y*100)]->990000
+	memory[62743+x+(y*100)]->990000
+	memory[62744+x+(y*100)]->990000
+	memory[62745+x+(y*100)]->990000
+	memory[62802+x+(y*100)]->990000
+	memory[62803+x+(y*100)]->990000
+	memory[62806+x+(y*100)]->990000
+	memory[62807+x+(y*100)]->990000
+	memory[62808+x+(y*100)]->990000
+	memory[62811+x+(y*100)]->990000
+	memory[62812+x+(y*100)]->990000
+	memory[62815+x+(y*100)]->990000
+	memory[62816+x+(y*100)]->990000
+	memory[62817+x+(y*100)]->990000
+	memory[62818+x+(y*100)]->990000
+	memory[62819+x+(y*100)]->990000
+	memory[62820+x+(y*100)]->990000
+	memory[62821+x+(y*100)]->990000
+	memory[62822+x+(y*100)]->990000
+	memory[62823+x+(y*100)]->990000
+	memory[62824+x+(y*100)]->990000
+	memory[62825+x+(y*100)]->990000
+	memory[62826+x+(y*100)]->990000
+	memory[62827+x+(y*100)]->990000
+	memory[62828+x+(y*100)]->990000
+	memory[62829+x+(y*100)]->990000
+	memory[62830+x+(y*100)]->990000
+	memory[62831+x+(y*100)]->990000
+	memory[62832+x+(y*100)]->990000
+	memory[62833+x+(y*100)]->990000
+	memory[62834+x+(y*100)]->990000
+	memory[62835+x+(y*100)]->990000
+	memory[62836+x+(y*100)]->990000
+	memory[62837+x+(y*100)]->990000
+	memory[62838+x+(y*100)]->990000
+	memory[62839+x+(y*100)]->990000
+	memory[62840+x+(y*100)]->990000
+	memory[62841+x+(y*100)]->990000
+	memory[62842+x+(y*100)]->990000
+	memory[62844+x+(y*100)]->990000
+	memory[62845+x+(y*100)]->990000
+	memory[62902+x+(y*100)]->990000
+	memory[62903+x+(y*100)]->990000
+	memory[62906+x+(y*100)]->990000
+	memory[62907+x+(y*100)]->990000
+	memory[62908+x+(y*100)]->990000
+	memory[62911+x+(y*100)]->990000
+	memory[62912+x+(y*100)]->990000
+	memory[62916+x+(y*100)]->990000
+	memory[62917+x+(y*100)]->990000
+	memory[62918+x+(y*100)]->990000
+	memory[62919+x+(y*100)]->990000
+	memory[62920+x+(y*100)]->990000
+	memory[62921+x+(y*100)]->990000
+	memory[62922+x+(y*100)]->990000
+	memory[62923+x+(y*100)]->990000
+	memory[62924+x+(y*100)]->990000
+	memory[62925+x+(y*100)]->990000
+	memory[62926+x+(y*100)]->990000
+	memory[62927+x+(y*100)]->990000
+	memory[62928+x+(y*100)]->990000
+	memory[62929+x+(y*100)]->990000
+	memory[62930+x+(y*100)]->990000
+	memory[62931+x+(y*100)]->990000
+	memory[62932+x+(y*100)]->990000
+	memory[62933+x+(y*100)]->990000
+	memory[62934+x+(y*100)]->990000
+	memory[62935+x+(y*100)]->990000
+	memory[62936+x+(y*100)]->990000
+	memory[62937+x+(y*100)]->990000
+	memory[62938+x+(y*100)]->990000
+	memory[62939+x+(y*100)]->990000
+	memory[62940+x+(y*100)]->990000
+	memory[62941+x+(y*100)]->990000
+	memory[62942+x+(y*100)]->990000
+	memory[63002+x+(y*100)]->990000
+	memory[63003+x+(y*100)]->990000
+	memory[63011+x+(y*100)]->990000
+	memory[63012+x+(y*100)]->990000
+	memory[63016+x+(y*100)]->990000
+	memory[63017+x+(y*100)]->990000
+	memory[63018+x+(y*100)]->990000
+	memory[63019+x+(y*100)]->990000
+	memory[63020+x+(y*100)]->990000
+	memory[63021+x+(y*100)]->990000
+	memory[63022+x+(y*100)]->990000
+	memory[63023+x+(y*100)]->990000
+	memory[63024+x+(y*100)]->990000
+	memory[63025+x+(y*100)]->990000
+	memory[63026+x+(y*100)]->990000
+	memory[63027+x+(y*100)]->990000
+	memory[63028+x+(y*100)]->990000
+	memory[63029+x+(y*100)]->990000
+	memory[63030+x+(y*100)]->990000
+	memory[63031+x+(y*100)]->990000
+	memory[63032+x+(y*100)]->990000
+	memory[63033+x+(y*100)]->990000
+	memory[63034+x+(y*100)]->990000
+	memory[63035+x+(y*100)]->990000
+	memory[63036+x+(y*100)]->990000
+	memory[63041+x+(y*100)]->990000
+	memory[63042+x+(y*100)]->990000
+	memory[63102+x+(y*100)]->990000
+	memory[63103+x+(y*100)]->990000
+	memory[63111+x+(y*100)]->990000
+	memory[63112+x+(y*100)]->990000
+	memory[63117+x+(y*100)]->990000
+	memory[63118+x+(y*100)]->990000
+	memory[63119+x+(y*100)]->990000
+	memory[63120+x+(y*100)]->990000
+	memory[63121+x+(y*100)]->990000
+	memory[63122+x+(y*100)]->990000
+	memory[63130+x+(y*100)]->990000
+	memory[63131+x+(y*100)]->990000
+	memory[63132+x+(y*100)]->990000
+	memory[63141+x+(y*100)]->990000
+	memory[63202+x+(y*100)]->990000
+	memory[63203+x+(y*100)]->990000
+	memory[63204+x+(y*100)]->990000
+	memory[63210+x+(y*100)]->990000
+	memory[63211+x+(y*100)]->990000
+	memory[63212+x+(y*100)]->990000
+	memory[63232+x+(y*100)]->990000
+	memory[63241+x+(y*100)]->990000
+	memory[63302+x+(y*100)]->990000
+	memory[63303+x+(y*100)]->990000
+	memory[63304+x+(y*100)]->990000
+	memory[63305+x+(y*100)]->990000
+	memory[63306+x+(y*100)]->990000
+	memory[63307+x+(y*100)]->990000
+	memory[63308+x+(y*100)]->990000
+	memory[63309+x+(y*100)]->990000
+	memory[63310+x+(y*100)]->990000
+	memory[63311+x+(y*100)]->990000
+	memory[63312+x+(y*100)]->990000
+	memory[63332+x+(y*100)]->990000
+	memory[63333+x+(y*100)]->990000
+	memory[63334+x+(y*100)]->990000
+	memory[63335+x+(y*100)]->990000
+	memory[63336+x+(y*100)]->990000
+	memory[63337+x+(y*100)]->990000
+	memory[63338+x+(y*100)]->990000
+	memory[63339+x+(y*100)]->990000
+	memory[63340+x+(y*100)]->990000
+	memory[63341+x+(y*100)]->990000
+	memory[63403+x+(y*100)]->990000
+	memory[63404+x+(y*100)]->990000
+	memory[63405+x+(y*100)]->990000
+	memory[63406+x+(y*100)]->990000
+	memory[63407+x+(y*100)]->990000
+	memory[63408+x+(y*100)]->990000
+	memory[63409+x+(y*100)]->990000
+	memory[63410+x+(y*100)]->990000
+	memory[63411+x+(y*100)]->990000
+	memory[63434+x+(y*100)]->990000
+	memory[63435+x+(y*100)]->990000
+	memory[63436+x+(y*100)]->990000
+	memory[63437+x+(y*100)]->990000
+	memory[63438+x+(y*100)]->990000
+	memory[63439+x+(y*100)]->990000
+
+
+#Enter押したら走ってくる白と青のバイク
+def bike_color3(x,y)
+	memory[60020+x+(y*100)]->999999
+	memory[60021+x+(y*100)]->999999
+	memory[60022+x+(y*100)]->999999
+	memory[60023+x+(y*100)]->999999
+	memory[60024+x+(y*100)]->999999
+	memory[60119+x+(y*100)]->999999
+	memory[60120+x+(y*100)]->000000
+	memory[60121+x+(y*100)]->000000
+	memory[60122+x+(y*100)]->000000
+	memory[60123+x+(y*100)]->000000
+	memory[60124+x+(y*100)]->000000
+	memory[60125+x+(y*100)]->999999
+	memory[60210+x+(y*100)]->999999
+	memory[60211+x+(y*100)]->999999
+	memory[60212+x+(y*100)]->999999
+	memory[60213+x+(y*100)]->999999
+	memory[60214+x+(y*100)]->999999
+	memory[60220+x+(y*100)]->999999
+	memory[60221+x+(y*100)]->999999
+	memory[60222+x+(y*100)]->000099
+	memory[60223+x+(y*100)]->993000
+	memory[60224+x+(y*100)]->999999
+	memory[60309+x+(y*100)]->999999
+	memory[60310+x+(y*100)]->000000
+	memory[60311+x+(y*100)]->000000
+	memory[60312+x+(y*100)]->000000
+	memory[60313+x+(y*100)]->000000
+	memory[60314+x+(y*100)]->000000
+	memory[60315+x+(y*100)]->999999
+	memory[60316+x+(y*100)]->000000
+	memory[60317+x+(y*100)]->000000
+	memory[60318+x+(y*100)]->000000
+	memory[60319+x+(y*100)]->000000
+	memory[60320+x+(y*100)]->000000
+	memory[60321+x+(y*100)]->999999
+	memory[60322+x+(y*100)]->000099
+	memory[60323+x+(y*100)]->000099
+	memory[60324+x+(y*100)]->000099
+	memory[60325+x+(y*100)]->999999
+	memory[60326+x+(y*100)]->999999
+	memory[60402+x+(y*100)]->999999
+	memory[60403+x+(y*100)]->999999
+	memory[60404+x+(y*100)]->999999
+	memory[60405+x+(y*100)]->999999
+	memory[60406+x+(y*100)]->999999
+	memory[60407+x+(y*100)]->999999
+	memory[60408+x+(y*100)]->999999
+	memory[60409+x+(y*100)]->999999
+	memory[60410+x+(y*100)]->000000
+	memory[60411+x+(y*100)]->000000
+	memory[60412+x+(y*100)]->000000
+	memory[60413+x+(y*100)]->000000
+	memory[60414+x+(y*100)]->000000
+	memory[60415+x+(y*100)]->000000
+	memory[60416+x+(y*100)]->999999
+	memory[60417+x+(y*100)]->000000
+	memory[60418+x+(y*100)]->000000
+	memory[60419+x+(y*100)]->000000
+	memory[60420+x+(y*100)]->000000
+	memory[60421+x+(y*100)]->999999
+	memory[60422+x+(y*100)]->000099
+	memory[60423+x+(y*100)]->000099
+	memory[60424+x+(y*100)]->000099
+	memory[60425+x+(y*100)]->000000
+	memory[60426+x+(y*100)]->999900
+	memory[60427+x+(y*100)]->999999
+	memory[60501+x+(y*100)]->999999
+	memory[60502+x+(y*100)]->000000
+	memory[60503+x+(y*100)]->000099
+	memory[60504+x+(y*100)]->000099
+	memory[60505+x+(y*100)]->000099
+	memory[60506+x+(y*100)]->000099
+	memory[60507+x+(y*100)]->000099
+	memory[60508+x+(y*100)]->000000
+	memory[60509+x+(y*100)]->000000
+	memory[60510+x+(y*100)]->000000
+	memory[60511+x+(y*100)]->000000
+	memory[60512+x+(y*100)]->000099
+	memory[60513+x+(y*100)]->000099
+	memory[60514+x+(y*100)]->999999
+	memory[60515+x+(y*100)]->999999
+	memory[60516+x+(y*100)]->000000
+	memory[60517+x+(y*100)]->000000
+	memory[60518+x+(y*100)]->999999
+	memory[60519+x+(y*100)]->999999
+	memory[60520+x+(y*100)]->999999
+	memory[60521+x+(y*100)]->000000
+	memory[60522+x+(y*100)]->000099
+	memory[60523+x+(y*100)]->000099
+	memory[60524+x+(y*100)]->000000
+	memory[60525+x+(y*100)]->000000
+	memory[60526+x+(y*100)]->999900
+	memory[60527+x+(y*100)]->999999
+	memory[60602+x+(y*100)]->999999
+	memory[60603+x+(y*100)]->999999
+	memory[60604+x+(y*100)]->999999
+	memory[60605+x+(y*100)]->000099
+	memory[60606+x+(y*100)]->000099
+	memory[60607+x+(y*100)]->000099
+	memory[60608+x+(y*100)]->000099
+	memory[60609+x+(y*100)]->000099
+	memory[60610+x+(y*100)]->000099
+	memory[60611+x+(y*100)]->000099
+	memory[60612+x+(y*100)]->000099
+	memory[60613+x+(y*100)]->000099
+	memory[60614+x+(y*100)]->999999
+	memory[60615+x+(y*100)]->999999
+	memory[60616+x+(y*100)]->999999
+	memory[60617+x+(y*100)]->999999
+	memory[60618+x+(y*100)]->000000
+	memory[60619+x+(y*100)]->000000
+	memory[60620+x+(y*100)]->000000
+	memory[60621+x+(y*100)]->000099
+	memory[60622+x+(y*100)]->000099
+	memory[60623+x+(y*100)]->000099
+	memory[60624+x+(y*100)]->000099
+	memory[60625+x+(y*100)]->999999
+	memory[60626+x+(y*100)]->999999
+	memory[60627+x+(y*100)]->999999
+	memory[60701+x+(y*100)]->999999
+	memory[60702+x+(y*100)]->999999
+	memory[60703+x+(y*100)]->999999
+	memory[60704+x+(y*100)]->993000
+	memory[60705+x+(y*100)]->993000
+	memory[60706+x+(y*100)]->000099
+	memory[60707+x+(y*100)]->000099
+	memory[60708+x+(y*100)]->000099
+	memory[60709+x+(y*100)]->999999
+	memory[60710+x+(y*100)]->999999
+	memory[60711+x+(y*100)]->999999
+	memory[60712+x+(y*100)]->999999
+	memory[60713+x+(y*100)]->000099
+	memory[60714+x+(y*100)]->000000
+	memory[60715+x+(y*100)]->000000
+	memory[60716+x+(y*100)]->000000
+	memory[60717+x+(y*100)]->000000
+	memory[60718+x+(y*100)]->000000
+	memory[60719+x+(y*100)]->999999
+	memory[60720+x+(y*100)]->999999
+	memory[60721+x+(y*100)]->000099
+	memory[60722+x+(y*100)]->000099
+	memory[60723+x+(y*100)]->000099
+	memory[60724+x+(y*100)]->000099
+	memory[60725+x+(y*100)]->000000
+	memory[60726+x+(y*100)]->000000
+	memory[60727+x+(y*100)]->000000
+	memory[60728+x+(y*100)]->999999
+	memory[60800+x+(y*100)]->999999
+	memory[60801+x+(y*100)]->990000
+	memory[60802+x+(y*100)]->990000
+	memory[60803+x+(y*100)]->000099
+	memory[60804+x+(y*100)]->000000
+	memory[60805+x+(y*100)]->000000
+	memory[60806+x+(y*100)]->000000
+	memory[60807+x+(y*100)]->000000
+	memory[60808+x+(y*100)]->000099
+	memory[60809+x+(y*100)]->000099
+	memory[60810+x+(y*100)]->999999
+	memory[60811+x+(y*100)]->999999
+	memory[60812+x+(y*100)]->999999
+	memory[60813+x+(y*100)]->000099
+	memory[60814+x+(y*100)]->000000
+	memory[60815+x+(y*100)]->999999
+	memory[60816+x+(y*100)]->999999
+	memory[60817+x+(y*100)]->999999
+	memory[60818+x+(y*100)]->999999
+	memory[60819+x+(y*100)]->999999
+	memory[60820+x+(y*100)]->000000
+	memory[60821+x+(y*100)]->000000
+	memory[60822+x+(y*100)]->000099
+	memory[60823+x+(y*100)]->000099
+	memory[60824+x+(y*100)]->000000
+	memory[60825+x+(y*100)]->000000
+	memory[60826+x+(y*100)]->000000
+	memory[60827+x+(y*100)]->999999
+	memory[60828+x+(y*100)]->000000
+	memory[60829+x+(y*100)]->999999
+	memory[60901+x+(y*100)]->999999
+	memory[60902+x+(y*100)]->000099
+	memory[60903+x+(y*100)]->000000
+	memory[60904+x+(y*100)]->999999
+	memory[60905+x+(y*100)]->999999
+	memory[60906+x+(y*100)]->999999
+	memory[60907+x+(y*100)]->999999
+	memory[60908+x+(y*100)]->000000
+	memory[60909+x+(y*100)]->000099
+	memory[60910+x+(y*100)]->000099
+	memory[60911+x+(y*100)]->000099
+	memory[60912+x+(y*100)]->000099
+	memory[60913+x+(y*100)]->000099
+	memory[60914+x+(y*100)]->999999
+	memory[60915+x+(y*100)]->999999
+	memory[60916+x+(y*100)]->999999
+	memory[60917+x+(y*100)]->999999
+	memory[60918+x+(y*100)]->999999
+	memory[60919+x+(y*100)]->999999
+	memory[60920+x+(y*100)]->000000
+	memory[60921+x+(y*100)]->000000
+	memory[60922+x+(y*100)]->000099
+	memory[60923+x+(y*100)]->000099
+	memory[60924+x+(y*100)]->999999
+	memory[60925+x+(y*100)]->999999
+	memory[60926+x+(y*100)]->999999
+	memory[60927+x+(y*100)]->000000
+	memory[60928+x+(y*100)]->999999
+	memory[60929+x+(y*100)]->000000
+	memory[60930+x+(y*100)]->999999
+	memory[61000+x+(y*100)]->999999
+	memory[61001+x+(y*100)]->000000
+	memory[61002+x+(y*100)]->000099
+	memory[61003+x+(y*100)]->000000
+	memory[61004+x+(y*100)]->999999
+	memory[61005+x+(y*100)]->000099
+	memory[61006+x+(y*100)]->000099
+	memory[61007+x+(y*100)]->999999
+	memory[61008+x+(y*100)]->000000
+	memory[61009+x+(y*100)]->000099
+	memory[61010+x+(y*100)]->000099
+	memory[61011+x+(y*100)]->000099
+	memory[61012+x+(y*100)]->000000
+	memory[61013+x+(y*100)]->000000
+	memory[61014+x+(y*100)]->000000
+	memory[61015+x+(y*100)]->000000
+	memory[61016+x+(y*100)]->000000
+	memory[61017+x+(y*100)]->000000
+	memory[61018+x+(y*100)]->000000
+	memory[61019+x+(y*100)]->000000
+	memory[61020+x+(y*100)]->000000
+	memory[61021+x+(y*100)]->999999
+	memory[61022+x+(y*100)]->000000
+	memory[61023+x+(y*100)]->000099
+	memory[61024+x+(y*100)]->000099
+	memory[61025+x+(y*100)]->000099
+	memory[61026+x+(y*100)]->999999
+	memory[61027+x+(y*100)]->000000
+	memory[61028+x+(y*100)]->999999
+	memory[61100+x+(y*100)]->999999
+	memory[61101+x+(y*100)]->000000
+	memory[61102+x+(y*100)]->999999
+	memory[61103+x+(y*100)]->000000
+	memory[61104+x+(y*100)]->999999
+	memory[61105+x+(y*100)]->000099
+	memory[61106+x+(y*100)]->000099
+	memory[61107+x+(y*100)]->000099
+	memory[61108+x+(y*100)]->000099
+	memory[61109+x+(y*100)]->000099
+	memory[61110+x+(y*100)]->000000
+	memory[61111+x+(y*100)]->000000
+	memory[61112+x+(y*100)]->000000
+	memory[61113+x+(y*100)]->000000
+	memory[61114+x+(y*100)]->000000
+	memory[61115+x+(y*100)]->000000
+	memory[61116+x+(y*100)]->000000
+	memory[61117+x+(y*100)]->000000
+	memory[61118+x+(y*100)]->000000
+	memory[61119+x+(y*100)]->000000
+	memory[61120+x+(y*100)]->000000
+	memory[61121+x+(y*100)]->999999
+	memory[61122+x+(y*100)]->000000
+	memory[61123+x+(y*100)]->999999
+	memory[61124+x+(y*100)]->000099
+	memory[61125+x+(y*100)]->000099
+	memory[61126+x+(y*100)]->999999
+	memory[61127+x+(y*100)]->000000
+	memory[61128+x+(y*100)]->999999
+	memory[61201+x+(y*100)]->999999
+	memory[61202+x+(y*100)]->999999
+	memory[61203+x+(y*100)]->000000
+	memory[61204+x+(y*100)]->999999
+	memory[61205+x+(y*100)]->999999
+	memory[61206+x+(y*100)]->999999
+	memory[61207+x+(y*100)]->999999
+	memory[61208+x+(y*100)]->000000
+	memory[61209+x+(y*100)]->999999
+	memory[61210+x+(y*100)]->999999
+	memory[61211+x+(y*100)]->999999
+	memory[61212+x+(y*100)]->999999
+	memory[61213+x+(y*100)]->999999
+	memory[61214+x+(y*100)]->999999
+	memory[61215+x+(y*100)]->000000
+	memory[61216+x+(y*100)]->000000
+	memory[61217+x+(y*100)]->999999
+	memory[61218+x+(y*100)]->999999
+	memory[61219+x+(y*100)]->000000
+	memory[61220+x+(y*100)]->000000
+	memory[61221+x+(y*100)]->999999
+	memory[61222+x+(y*100)]->000000
+	memory[61223+x+(y*100)]->999999
+	memory[61224+x+(y*100)]->999999
+	memory[61225+x+(y*100)]->999999
+	memory[61226+x+(y*100)]->999999
+	memory[61227+x+(y*100)]->000000
+	memory[61228+x+(y*100)]->999999
+	memory[61303+x+(y*100)]->999999
+	memory[61304+x+(y*100)]->000000
+	memory[61305+x+(y*100)]->000000
+	memory[61306+x+(y*100)]->000000
+	memory[61307+x+(y*100)]->000000
+	memory[61308+x+(y*100)]->999999
+	memory[61314+x+(y*100)]->999999
+	memory[61315+x+(y*100)]->000000
+	memory[61316+x+(y*100)]->999999
+	memory[61319+x+(y*100)]->999999
+	memory[61320+x+(y*100)]->999999
+	memory[61322+x+(y*100)]->999999
+	memory[61323+x+(y*100)]->000000
+	memory[61324+x+(y*100)]->000000
+	memory[61325+x+(y*100)]->000000
+	memory[61326+x+(y*100)]->000000
+	memory[61327+x+(y*100)]->999999
+	memory[61404+x+(y*100)]->999999
+	memory[61405+x+(y*100)]->999999
+	memory[61406+x+(y*100)]->999999
+	memory[61407+x+(y*100)]->999999
+	memory[61415+x+(y*100)]->999999
+	memory[61423+x+(y*100)]->999999
+	memory[61424+x+(y*100)]->999999
+	memory[61425+x+(y*100)]->999999
+	memory[61426+x+(y*100)]->999999
