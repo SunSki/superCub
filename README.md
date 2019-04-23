@@ -5,3 +5,6 @@
 
 ## 使用ツール
 [Sunaba](https://hirasho.github.io/Sunaba/)
+
+## プレイ動画
+[Youtube:SuperCubGo](https://www.youtube.com/watch?v=R7xBqsUGLko)
